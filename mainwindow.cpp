@@ -54,7 +54,7 @@ void MainWindow::togglePowerButton(){
         if (powerStatus) {
             qInfo() << "Machine turned on.";
             pi_scene->setBackgroundBrush(Qt::green);
-
+        //Turns Machine off
         } else {
             qInfo() << "Machine turned off.";
             pi_scene->setBackgroundBrush(Qt::white);
