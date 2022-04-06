@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     pi_scene = new QGraphicsScene(this);
     ui->powerIndicator->setScene(pi_scene);
 
-    QPixmap oneOff (":/images/bars/bar1off.png");
+    QPixmap oneOff (":/images/bars/resources/bar1off.png");
     ui->bar1->setPixmap(oneOff.scaled(50, 50, Qt::KeepAspectRatio));
     QPixmap twoOff (":/images/bars/bar2off.png");
     ui->bar2->setPixmap(twoOff.scaled(50, 50, Qt::KeepAspectRatio));
@@ -33,9 +33,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QPixmap eightOff (":/images/bars/bar8off.png");
     ui->bar8->setPixmap(eightOff.scaled(50, 50, Qt::KeepAspectRatio));
 
-    barVector.append(ui->bar1);
-    QPixmap pOn (":/images/bars/bar1on.png");
-    barVector.at(0)->setPixmap(pOn.scaled(50, 50, Qt::KeepAspectRatio));
+//    barVector.append(ui->bar1);
+//    QPixmap pOn (":/images/bars/bar1on.png");
+//    barVector.at(0)->setPixmap(pOn.scaled(50, 50, Qt::KeepAspectRatio));
 
 
 
