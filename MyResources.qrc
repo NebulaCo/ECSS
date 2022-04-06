@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/images/bars">
-        <file>bar1off.png</file>
         <file>bar1on.png</file>
         <file>bar2off.png</file>
         <file>bar2on.png</file>
@@ -16,5 +15,6 @@
         <file>bar7on.png</file>
         <file>bar8off.png</file>
         <file>bar8on.png</file>
+        <file>resources/bar1off.png</file>
     </qresource>
 </RCC>
