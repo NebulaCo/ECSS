@@ -21,6 +21,8 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    QElapsedTimer batteryTimer;
+
     QElapsedTimer buttonTimer;
     bool powerStatus;
 
@@ -30,8 +32,12 @@ private:
     QGraphicsScene *pi_scene;
     QGraphicsScene *n1_scene;
 
-    int batterLevel;
+    int batteryLevel;
     void displayBatteryLevel();
+
+
+    void initalizeVectors();
+    void initializeScreen();
 
 private slots:
     void checkPress();

@@ -11,40 +11,59 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     powerStatus = false;
     connect(ui->powerButton, SIGNAL(released()), this, SLOT(togglePowerButton()));
 
-    batterLevel = 8;
+    batteryLevel = 8;
 
     pi_scene = new QGraphicsScene(this);
     ui->powerIndicator->setScene(pi_scene);
 
-    QPixmap oneOff (":/images/bars/resources/bar1off.png");
-    ui->bar1->setPixmap(oneOff.scaled(50, 50, Qt::KeepAspectRatio));
-    QPixmap twoOff (":/images/bars/bar2off.png");
-    ui->bar2->setPixmap(twoOff.scaled(50, 50, Qt::KeepAspectRatio));
-    QPixmap threeOff (":/images/bars/bar3off.png");
-    ui->bar3->setPixmap(threeOff.scaled(50, 50, Qt::KeepAspectRatio));
-    QPixmap fourOff (":/images/bars/bar4off.png");
-    ui->bar4->setPixmap(fourOff.scaled(50, 50, Qt::KeepAspectRatio));
-    QPixmap fiveOff (":/images/bars/bar5off.png");
-    ui->bar5->setPixmap(fiveOff.scaled(50, 50, Qt::KeepAspectRatio));
-    QPixmap sixOff (":/images/bars/bar6off.png");
-    ui->bar6->setPixmap(sixOff.scaled(50, 50, Qt::KeepAspectRatio));
-    QPixmap sevenOff (":/images/bars/bar7off.png");
-    ui->bar7->setPixmap(sevenOff.scaled(50, 50, Qt::KeepAspectRatio));
-    QPixmap eightOff (":/images/bars/bar8off.png");
-    ui->bar8->setPixmap(eightOff.scaled(50, 50, Qt::KeepAspectRatio));
-
-//    barVector.append(ui->bar1);
-//    QPixmap pOn (":/images/bars/bar1on.png");
-//    barVector.at(0)->setPixmap(pOn.scaled(50, 50, Qt::KeepAspectRatio));
+    initalizeVectors();
+    initializeScreen();
 
 
+    QPixmap rtb (":/images/symbols/sessions/Red_TOP_R.png");
+    ui->rightTopBar->setPixmap(rtb.scaled(50, 50, Qt::KeepAspectRatio));
 
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
     delete ui;
 }
+
+void MainWindow::initalizeVectors(){
+    barVector.append(ui->bar1);
+    barVector.append(ui->bar2);
+    barVector.append(ui->bar3);
+    barVector.append(ui->bar4);
+    barVector.append(ui->bar5);
+    barVector.append(ui->bar6);
+    barVector.append(ui->bar7);
+    barVector.append(ui->bar8);
+}
+
+void MainWindow::initializeScreen(){
+    QString str;
+    for (int i = 0; i < 8; i++){
+        str = QString::number(i+1);
+        QPixmap numOff (":/images/symbols/bars/bar" + str + "off.png");
+        barVector.at(i)->setPixmap(numOff.scaled(50, 50, Qt::KeepAspectRatio));
+    }
+
+}
+
+void MainWindow::displayBatteryLevel(){
+    QString str;
+    for (int i = 0; i < batteryLevel; i++){
+        str = QString::number(i+1);
+        QPixmap numOn (":/images/symbols/bars/bar"+str+"on.png");
+        barVector.at(i)->setPixmap(numOn.scaled(50, 50, Qt::KeepAspectRatio));
+    }
+    for (int i = batteryLevel; i < 8; i++){
+        str = QString::number(i+1);
+        QPixmap numOff (":/images/symbols/bars/bar"+str+"off.png");
+        barVector.at(i)->setPixmap(numOff.scaled(50, 50, Qt::KeepAspectRatio));
+    }
+}
+
 
 
 void MainWindow::checkPress() {
@@ -58,12 +77,14 @@ void MainWindow::togglePowerButton(){
         if (powerStatus) {
             qInfo() << "Machine turned on.";
             pi_scene->setBackgroundBrush(Qt::green);
-
+            displayBatteryLevel();
 
 
         } else {
             qInfo() << "Machine turned off.";
             pi_scene->setBackgroundBrush(Qt::white);
+
+
         }
     } else {
         //Cycling
@@ -73,24 +94,12 @@ void MainWindow::togglePowerButton(){
     }
 }
 
-void MainWindow::displayBatteryLevel(){
-
-
-
-    for (int i = 0; i < batterLevel; i++){
-
-        QString s1 = QString::number(i);
-        QPixmap pOn (":/images/bars/bar"+s1+"on.png");
-        ui->bar1->setPixmap(pOn.scaled(50, 50, Qt::KeepAspectRatio));
-
-    }
-}
 
 
 
 void MainWindow::toggleIntensityButton(){
     QString s1 = QString::number(8);
 
-    QPixmap connectionBar ();
+
 
 }

@@ -1,20 +1,21 @@
 <RCC>
-    <qresource prefix="/images/bars">
-        <file>bar1on.png</file>
-        <file>bar2off.png</file>
-        <file>bar2on.png</file>
-        <file>bar3off.png</file>
-        <file>bar3on.png</file>
-        <file>bar4off.png</file>
-        <file>bar4on.png</file>
-        <file>bar5off.png</file>
-        <file>bar5on.png</file>
-        <file>bar6off.png</file>
-        <file>bar6on.png</file>
-        <file>bar7off.png</file>
-        <file>bar7on.png</file>
-        <file>bar8off.png</file>
-        <file>bar8on.png</file>
-        <file>resources/bar1off.png</file>
+    <qresource prefix="/images">
+        <file>symbols/bars/bar1off.png</file>
+        <file>symbols/bars/bar1on.png</file>
+        <file>symbols/bars/bar2off.png</file>
+        <file>symbols/bars/bar2on.png</file>
+        <file>symbols/bars/bar3off.png</file>
+        <file>symbols/bars/bar3on.png</file>
+        <file>symbols/bars/bar4off.png</file>
+        <file>symbols/bars/bar4on.png</file>
+        <file>symbols/bars/bar5off.png</file>
+        <file>symbols/bars/bar5on.png</file>
+        <file>symbols/bars/bar6off.png</file>
+        <file>symbols/bars/bar6on.png</file>
+        <file>symbols/bars/bar7off.png</file>
+        <file>symbols/bars/bar7on.png</file>
+        <file>symbols/bars/bar8off.png</file>
+        <file>symbols/bars/bar8on.png</file>
+        <file>symbols/sessions/Red_TOP_R.png</file>
     </qresource>
 </RCC>
