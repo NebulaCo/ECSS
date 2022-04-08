@@ -16,6 +16,29 @@
         <file>symbols/bars/bar7on.png</file>
         <file>symbols/bars/bar8off.png</file>
         <file>symbols/bars/bar8on.png</file>
-        <file>symbols/sessions/Red_TOP_R.png</file>
+        <file>symbols/groups/group1off.png</file>
+        <file>symbols/groups/group1on.png</file>
+        <file>symbols/groups/group2off.png</file>
+        <file>symbols/groups/group2on.png</file>
+        <file>symbols/groups/group3off.png</file>
+        <file>symbols/groups/group3on.png</file>
+        <file>symbols/groups/group4off.png</file>
+        <file>symbols/groups/group4on.png</file>
+        <file>symbols/sessions/session1off.png</file>
+        <file>symbols/sessions/session1on.png</file>
+        <file>symbols/sessions/session2off.png</file>
+        <file>symbols/sessions/session2on.png</file>
+        <file>symbols/sessions/session3off.png</file>
+        <file>symbols/sessions/session3on.png</file>
+        <file>symbols/sessions/session4off.png</file>
+        <file>symbols/sessions/session4on.png</file>
+        <file>symbols/sessions/session5off.png</file>
+        <file>symbols/sessions/session5on.png</file>
+        <file>symbols/sessions/session6off.png</file>
+        <file>symbols/sessions/session6on.png</file>
+        <file>symbols/sessions/session7off.png</file>
+        <file>symbols/sessions/session7on.png</file>
+        <file>symbols/sessions/session8off.png</file>
+        <file>symbols/sessions/session8on.png</file>
     </qresource>
 </RCC>

@@ -21,12 +21,15 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    QElapsedTimer batteryTimer;
 
     QElapsedTimer buttonTimer;
     bool powerStatus;
 
     QVector <QLabel*> barVector;
+    QVector <QLabel*> groupVector;
+    QVector <QLabel*> sessionVector;
+    int currentGroup;
+    int currentSession;
 
     //Power indicator scene
     QGraphicsScene *pi_scene;
@@ -34,6 +37,7 @@ private:
 
     int batteryLevel;
     void displayBatteryLevel();
+    void updateScreen();
 
 
     void initalizeVectors();
@@ -42,6 +46,7 @@ private:
 private slots:
     void checkPress();
     void togglePowerButton();
-    void toggleIntensityButton();
+    void toggleIntensityUp();
+    void toggleIntensityDown();
 };
 #endif // MAINWINDOW_H
