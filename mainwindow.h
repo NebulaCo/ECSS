@@ -31,6 +31,8 @@ private:
     int currentGroup;
     int currentSession;
 
+    int currentIntensity;
+
     //Power indicator scene
     QGraphicsScene *pi_scene;
     QGraphicsScene *n1_scene;
