@@ -228,7 +228,7 @@
    <widget class="QLabel" name="session4">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>320</x>
       <y>80</y>
       <width>51</width>
       <height>41</height>
@@ -241,7 +241,7 @@
    <widget class="QLabel" name="session2">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>190</x>
       <y>80</y>
       <width>51</width>
       <height>41</height>
@@ -254,7 +254,7 @@
    <widget class="QLabel" name="session3">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>250</x>
       <y>80</y>
       <width>51</width>
       <height>41</height>
@@ -267,59 +267,7 @@
    <widget class="QLabel" name="session1">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>80</y>
-      <width>51</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="session8">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>80</y>
-      <width>51</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="session6">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>80</y>
-      <width>51</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="session7">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>80</y>
-      <width>51</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="session5">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
+      <x>120</x>
       <y>80</y>
       <width>51</width>
       <height>41</height>

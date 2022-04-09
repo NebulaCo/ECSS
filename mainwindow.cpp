@@ -18,6 +18,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     currentGroup = -1;
     currentSession = -1;
 
+    currentIntensity = 0;
+
+
+
+
     pi_scene = new QGraphicsScene(this);
     ui->powerIndicator->setScene(pi_scene);
 
@@ -53,10 +58,6 @@ void MainWindow::initalizeVectors(){
     sessionVector.append(ui->session2);
     sessionVector.append(ui->session3);
     sessionVector.append(ui->session4);
-    sessionVector.append(ui->session5);
-    sessionVector.append(ui->session6);
-    sessionVector.append(ui->session7);
-    sessionVector.append(ui->session8);
 
 }
 
@@ -106,6 +107,20 @@ void MainWindow::checkPress() {
 void MainWindow::updateScreen(){
     int i;
     QString str;
+
+    if (!powerStatus){
+        for (i = 0; i < sessionVector.size(); i++){
+            str = QString::number(i+1);
+            QPixmap sessionOff (":/images/symbols/sessions/session" + str + "off.png");
+            sessionVector.at(i)->setPixmap(sessionOff.scaled(75, 100, Qt::KeepAspectRatio));
+        }
+        for (i = 0; i < groupVector.size(); i++){
+            str = QString::number(i+1);
+            QPixmap groupOff (":/images/symbols/groups/group" + str + "off.png");
+            groupVector.at(i)->setPixmap(groupOff.scaled(75, 100, Qt::KeepAspectRatio));
+        }
+        return;
+    }
     if (currentGroup != -1){
         for (i = 0; i < groupVector.size(); i++){
             str = QString::number(i+1);
@@ -135,17 +150,22 @@ void MainWindow::updateScreen(){
 }
 
 void MainWindow::togglePowerButton(){
-    if (buttonTimer.elapsed() >= 2000){
+    if (buttonTimer.elapsed() >= 1000){
         powerStatus = powerStatus ? false: true;
         if (powerStatus) {
             qInfo() << "Machine turned on.";
             pi_scene->setBackgroundBrush(Qt::green);
+            batteryLevel = 8;
             displayBatteryLevel();
+            updateScreen();
 
 
         } else {
             qInfo() << "Machine turned off.";
             pi_scene->setBackgroundBrush(Qt::white);
+            batteryLevel = 0;
+            displayBatteryLevel();
+            updateScreen();
         }
     } else if (powerStatus){
         //Cycling
@@ -157,14 +177,14 @@ void MainWindow::togglePowerButton(){
 
 void MainWindow::toggleIntensityUp(){
     if (powerStatus){
-        currentSession = (currentSession == 7) ? 0 : ++currentSession;
+        currentSession = (currentSession == 3) ? 0 : ++currentSession;
         updateScreen();
     }
 }
 
 void MainWindow::toggleIntensityDown(){
     if (powerStatus){
-        currentSession = (currentSession == 0) ? 7 : --currentSession;
+        currentSession = (currentSession == 0) ? 3 : --currentSession;
         updateScreen();
     }
 }
