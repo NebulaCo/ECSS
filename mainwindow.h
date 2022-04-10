@@ -35,6 +35,7 @@ private:
     QVector <QLabel*> barVector;
     QVector <QLabel*> groupVector;
     QVector <QLabel*> sessionVector;
+
     int currentGroup;
     int currentGroupDuration;
     int currentSessionType;
@@ -75,6 +76,8 @@ private:
 
     void drainBattery();
     void changeBattery();
+
+    void changeBatteryAsAdmin();
 
 private slots:
     void updateTimer();

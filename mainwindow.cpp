@@ -5,14 +5,16 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
+
+
     connect(ui->powerButton, SIGNAL(pressed()), this, SLOT(checkPress()));
-    connect(ui->intensityUp, SIGNAL(pressed()), this, SLOT(checkPress()));
-    connect(ui->intensityDown, SIGNAL(pressed()), this, SLOT(checkPress()));
+    connect(ui->intensityUpButton, SIGNAL(pressed()), this, SLOT(checkPress()));
+    connect(ui->intensityDownButton, SIGNAL(pressed()), this, SLOT(checkPress()));
 
 
     connect(ui->powerButton, SIGNAL(released()), this, SLOT(togglePowerButton()));
-    connect(ui->intensityUp, SIGNAL(released()), this, SLOT(toggleIntensityUp()));
-    connect(ui->intensityDown, SIGNAL(released()), this, SLOT(toggleIntensityDown()));
+    connect(ui->intensityUpButton, SIGNAL(released()), this, SLOT(toggleIntensityUp()));
+    connect(ui->intensityDownButton, SIGNAL(released()), this, SLOT(toggleIntensityDown()));
 
     connect(ui->checkButton, SIGNAL(released()), this, SLOT(startSession()));
     powerStatus = false;
@@ -24,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //battery level spinbox
 
     // TODO: fix this connect (causing battery to become 0)
-    connect(ui->batterySpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::changeBattery);
+    connect(ui->batterySpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::changeBatteryAsAdmin);
 
     // init battery
 
@@ -54,14 +56,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow(){
     delete ui;
-}
-
-int MainWindow::batteryToBars()
-{
-    //int temp = int(battery / 12.5);
-    int temp = int(100.0/12.5);
-    qInfo() << "gg " + QString::number(battery) + " " + QString::number(temp);
-    return temp;
 }
 
 void MainWindow::initalizeVectors(){
@@ -185,7 +179,6 @@ void MainWindow::togglePowerButton(){
             qInfo() << "battery: " + QString::number(battery);
             pi_scene->setBackgroundBrush(Qt::green);
             int bars = batteryToBars();
-            qInfo() << bars;
             displayBatteryLevel(bars);
             updateScreen();
 
@@ -275,8 +268,12 @@ void MainWindow::drainBattery()
 
 void MainWindow::changeBattery()
 {
+
+    //qInfo() << ui->batterySpinBox->value();
+
+
     if (battery >= 0 && battery <= 100){
-        ui->batterySpinBox->setValue(battery);
+        //ui->batterySpinBox->setValue(battery);
         if (battery = 0){
             //Turn the device off
             powerStatus = false;
@@ -292,6 +289,16 @@ void MainWindow::changeBattery()
             // blink 2 bars
         }
     }
+}
+
+void MainWindow::changeBatteryAsAdmin()
+{
+    battery = ui->batterySpinBox->value();
+}
+
+int MainWindow::batteryToBars()
+{
+    return int(battery / 12.5);
 }
 
 bool MainWindow::connectionTest(){
