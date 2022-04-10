@@ -26,11 +26,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //battery level spinbox
 
     // TODO: fix this connect (causing battery to become 0)
-    connect(ui->batterySpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::changeBatteryAsAdmin);
-
-    // init battery
-
-    ui->batterySpinBox->setValue(battery);
+    connect(ui->batterySpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::changeBattery);
 
     //connection spin box
     connect(ui->connectionComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::changeConnection);
@@ -105,7 +101,9 @@ void MainWindow::initializeScreen(){
     }
 }
 
-void MainWindow::displayBatteryLevel(int bars){
+void MainWindow::displayBatteryLevel(float battery){
+
+    int bars = int(battery / 12.5);
     QString str;
     int i;
     for (i = 0; i < bars; i++){
@@ -178,8 +176,7 @@ void MainWindow::togglePowerButton(){
             qInfo() << "Machine turned on.";
             qInfo() << "battery: " + QString::number(battery);
             pi_scene->setBackgroundBrush(Qt::green);
-            int bars = batteryToBars();
-            displayBatteryLevel(bars);
+            displayBatteryLevel(battery);
             updateScreen();
 
 
@@ -198,7 +195,7 @@ void MainWindow::turnOff(){
     pi_scene->setBackgroundBrush(Qt::white);
     connection = -1;
     currentGroup = -1;
-    currentIntensity = -1;
+    currentIntensity = 0;
     currentSessionType = -1;
 
     displayBatteryLevel(0);
@@ -223,7 +220,7 @@ void MainWindow::toggleIntensityDown(){
 void MainWindow::startSession(){
     if (canStartSession()){
         flashSelectedSession(currentSessionType);
-        Session* ses = new Session(1,"20",1);
+        Session* ses = new Session(currentIntensity,"heal",20);
         currentSession = ses;
 
         //start timer
@@ -244,13 +241,23 @@ void MainWindow::initTimer(QTimer* t) {
 }
 
 void MainWindow::updateTimer(){
+
     drainBattery();
+    currentSession->decrementTimeLeft();
+
+    if (currentSession->getTimeLeft() == 0){
+        currentSession->getTimer()->stop();
+        currentSession->getTimer()->disconnect();
+        currentSession = nullptr;
+    }
 
 }
 
 void MainWindow::drainBattery()
 {
     // 1 minute == 1 second
+    qInfo() << "drain battery function call: ";
+
 
     // if intensity is 0, battery drains by 0.02% per second
     if (currentIntensity == 0){
@@ -263,23 +270,26 @@ void MainWindow::drainBattery()
     if (battery < 0){
         battery = 0;
     }
-    changeBattery();
+    changeBattery(battery);
 }
 
-void MainWindow::changeBattery()
+void MainWindow::changeBattery(float newBattery)
 {
 
-    //qInfo() << ui->batterySpinBox->value();
+    if (newBattery >= 0 && newBattery <= 100){
 
-
-    if (battery >= 0 && battery <= 100){
-        //ui->batterySpinBox->setValue(battery);
-        if (battery = 0){
+        if (newBattery == 0.0 && powerStatus == true){
             //Turn the device off
             powerStatus = false;
             turnOff();
+        } else {
+            battery = newBattery;
+        }
+
+        ui->batterySpinBox->setValue(newBattery);
+
         //critical low 1 bar
-        } else if (battery <= 12.5){
+        if (battery <= 12.5){
             //TODO
             // stop blinking 2 bar (below statement)
             //end session
@@ -291,26 +301,19 @@ void MainWindow::changeBattery()
     }
 }
 
-void MainWindow::changeBatteryAsAdmin()
-{
-    battery = ui->batterySpinBox->value();
-}
-
-int MainWindow::batteryToBars()
-{
-    return int(battery / 12.5);
-}
-
 bool MainWindow::connectionTest(){
 
     if (connection == 1){
         MainWindow::badConnection();
+        qInfo() << "bad connection";
         return false;
     } else if (connection == 2){
         MainWindow::okayConnection();
+        qInfo() << "okay connection";
         return true;
     } else if (connection == 3){
         MainWindow::excellentConnection();
+        qInfo() << "excellent connection";
         return true;
     }
     return false;
@@ -365,16 +368,8 @@ void MainWindow::excellentConnection(){
 
 bool MainWindow::canStartSession(){
     if (powerStatus){
-        if (currentGroup != 1 && currentSessionType !=1){
-            qInfo() << "checking connection";
-            if (connectionTest() == true){
-                qInfo() << "starting session";
-                return true;
-            } else {
-                qInfo() << "bad connection, cannot start therapy";
-                return false;
-            }
-
+        if (currentGroup != -1 && currentSessionType != -1){
+            return connectionTest();
         } else {
             qInfo() << "Session duration or session type not selected.";
             return false;
@@ -396,5 +391,4 @@ void MainWindow::changeConnection(){
     } else {
         connection = 3;
     }
-    qInfo() << QString::number(connection);
 }

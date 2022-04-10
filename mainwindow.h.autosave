@@ -74,8 +74,6 @@ private:
     void drainBattery();
     void changeBattery(float);
 
-    void changeBatteryAsAdmin();
-
 private slots:
     void updateTimer();
     void checkPress();

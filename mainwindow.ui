@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="cursor">
-   <cursorShape>UpArrowCursor</cursorShape>
+   <cursorShape>ArrowCursor</cursorShape>
   </property>
   <property name="mouseTracking">
    <bool>false</bool>
@@ -63,7 +63,7 @@
         </rect>
        </property>
        <property name="cursor">
-        <cursorShape>ArrowCursor</cursorShape>
+        <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="styleSheet">
         <string notr="true">color:white</string>
@@ -94,6 +94,9 @@
          <height>61</height>
         </rect>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="styleSheet">
         <string notr="true">color: white</string>
        </property>
@@ -109,6 +112,9 @@
          <width>101</width>
          <height>61</height>
         </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="styleSheet">
         <string notr="true">color: white</string>
@@ -298,6 +304,9 @@
          <height>51</height>
         </rect>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="styleSheet">
         <string notr="true">color: white</string>
        </property>
@@ -449,7 +458,7 @@
            <enum>QAbstractSpinBox::DefaultStepType</enum>
           </property>
           <property name="value">
-           <double>69.000000000000000</double>
+           <double>100.000000000000000</double>
           </property>
          </widget>
         </item>
