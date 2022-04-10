@@ -6,18 +6,22 @@
 #include <QTimer>
 #include <QDateTime>
 
-class Session {
+class Session{
 
     public:
         Session(int i, QString sT, int t);
-        int getIntensityLvl();
-        QString getSessionType();
-        int getDuration();
+        ~Session();
+        int getIntensityLvl() const;
+        QString getSessionType() const;
+        int getDuration() const;
         void setIntensity(int i);
+        QTimer* getTimer() const;
+
     private:
         int intensityLevel;
         QString sessionType;
         int duration;
+        QTimer* timer;
 
 };
 
