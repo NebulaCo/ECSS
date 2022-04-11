@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include <QDebug>
@@ -31,12 +31,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //connection spin box
     connect(ui->connectionComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::changeConnection);
 
+    connect(ui->leftEarComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::earConnect);
+    connect(ui->rightEarComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::earConnect);
 
     currentGroup = -1;
     currentSessionType = -1;
 
     currentIntensity = 0;
     connection = -1;
+    sessionRunning = false;
 
     pi_scene = new QGraphicsScene(this);
     ui->powerIndicator->setScene(pi_scene);
@@ -152,7 +155,14 @@ void MainWindow::updateScreen(){
                 groupVector.at(i)->setPixmap(groupOff.scaled(75, 100, Qt::KeepAspectRatio));
             }
         }
+    } else {
+        for (i = 0; i < groupVector.size(); i++){
+            str = QString::number(i+1);
+            QPixmap groupOff (":/images/symbols/groups/group" + str + "off.png");
+            groupVector.at(i)->setPixmap(groupOff.scaled(75, 100, Qt::KeepAspectRatio));
+        }
     }
+
 
     if (currentSessionType != -1){
         for (i = 0; i < sessionVector.size(); i++){
@@ -164,6 +174,13 @@ void MainWindow::updateScreen(){
                 QPixmap sessionOff (":/images/symbols/sessions/session" + str + "off.png");
                 sessionVector.at(i)->setPixmap(sessionOff.scaled(75, 100, Qt::KeepAspectRatio));
             }
+        }
+    } else {
+        for (i = 0; i < sessionVector.size(); i++){
+            str = QString::number(i+1);
+            QPixmap sessionOff (":/images/symbols/sessions/session" + str + "off.png");
+            sessionVector.at(i)->setPixmap(sessionOff.scaled(75,100, Qt::KeepAspectRatio));
+
         }
     }
 
@@ -202,26 +219,81 @@ void MainWindow::turnOff(){
     updateScreen();
 }
 
+void MainWindow::softOff(){
+    qInfo() << "doing softoff";
+    while (currentIntensity > 0){
+        barSingleLight(currentIntensity);
+        currentIntensity--;
+        delay(1);
+    }
+}
+
+void MainWindow::delay(float delayDuration){
+    QTime dieTime = QTime::currentTime().addMSecs(delayDuration * 1000);
+    while (QTime::currentTime() < dieTime){
+        QCoreApplication::processEvents(QEventLoop::AllEvents,100);
+    }
+}
+
+void MainWindow::barSingleLight(int bar){
+    QString str;
+    for (int i = 0; i < BAR_COUNT; i++){
+        if ((bar - 1) == i){
+            str = QString::number(i+1);
+            QPixmap numOff (":/images/symbols/bars/bar"+str+"on.png");
+            barVector.at(i)->setPixmap(numOff.scaled(50, 50, Qt::KeepAspectRatio));
+        } else {
+            str = QString::number(i+1);
+            QPixmap numOff (":/images/symbols/bars/bar"+str+"off.png");
+            barVector.at(i)->setPixmap(numOff.scaled(50, 50, Qt::KeepAspectRatio));
+        }
+    }
+}
+
 
 void MainWindow::toggleIntensityUp(){
     if (powerStatus){
-        currentSessionType = (currentSessionType == SESSION_TYPE_COUNT-1) ? 0 : ++currentSessionType;
-        updateScreen();
+
+        if (sessionRunning == true){
+            //change intensity
+            currentIntensity++;
+            if (currentIntensity > 8){
+                currentIntensity = 8;
+            }
+            currentSession->setIntensity(currentIntensity);
+        } else {
+            currentSessionType = (currentSessionType == SESSION_TYPE_COUNT-1) ? 0 : ++currentSessionType;
+            updateScreen();
+        }
+
     }
 }
 
 void MainWindow::toggleIntensityDown(){
     if (powerStatus){
-        currentSessionType = (currentSessionType == 0) ? SESSION_TYPE_COUNT - 1  : --currentSessionType;
-        updateScreen();
+
+        if (sessionRunning == true){
+            //change intensity
+            currentIntensity--;
+            if (currentIntensity < 1){
+                currentIntensity = 1;
+            }
+            currentSession->setIntensity(currentIntensity);
+
+        } else {
+            currentSessionType = (currentSessionType == 0) ? SESSION_TYPE_COUNT - 1  : --currentSessionType;
+            updateScreen();
+        }
     }
 }
 
 void MainWindow::startSession(){
+    qInfo() << "checking canStartSession";
     if (canStartSession()){
         flashSelectedSession(currentSessionType);
-        Session* ses = new Session(currentIntensity,"heal",20);
+        Session* ses = new Session(1,"heal",8);
         currentSession = ses;
+        sessionRunning = true;
 
         //start timer
         initTimer(ses->getTimer());
@@ -244,13 +316,16 @@ void MainWindow::updateTimer(){
 
     drainBattery();
     currentSession->decrementTimeLeft();
+    qInfo() << "intensity is " << currentSession->getIntensityLvl();
 
     if (currentSession->getTimeLeft() == 0){
         currentSession->getTimer()->stop();
         currentSession->getTimer()->disconnect();
         currentSession = nullptr;
+        sessionRunning = false;
+        softOff();
+        turnOff();
     }
-
 }
 
 void MainWindow::drainBattery()
@@ -331,8 +406,6 @@ void MainWindow::badConnection(){
             QPixmap numOn (":/images/symbols/bars/bar" + str + "on.png");
             barVector.at(i)->setPixmap(numOn.scaled(50, 100, Qt::KeepAspectRatio));
         }
-
-
     }
 }
 
@@ -379,7 +452,14 @@ bool MainWindow::canStartSession(){
 }
 
 void MainWindow::flashSelectedSession(int session){
-
+    for (int i = 0; i < 6; i++){
+        if (i % 2 == 0){
+            barSingleLight(session+1);
+        } else {
+            barSingleLight(0);
+        }
+        delay(0.4);
+    }
 }
 
 void MainWindow::changeConnection(){
@@ -390,5 +470,15 @@ void MainWindow::changeConnection(){
         connection = 2;
     } else {
         connection = 3;
+    }
+}
+
+void MainWindow::earConnect(int val){
+    if (ui->leftEarComboBox->currentText() == "True" && ui->rightEarComboBox->currentText() == "True"){
+        if (ui->connectionComboBox->currentText() == "Bad"){
+            ui->connectionComboBox->setCurrentIndex(1);
+        }
+    } else {
+        ui->connectionComboBox->setCurrentIndex(0);
     }
 }

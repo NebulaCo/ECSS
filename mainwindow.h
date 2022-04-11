@@ -6,6 +6,7 @@
 #include <QGraphicsView>
 #include <QVector>
 #include <QLabel>
+#include <QTime>
 
 #include "session.h"
 
@@ -54,6 +55,7 @@ private:
     float battery;
 
     Session* currentSession;
+    bool sessionRunning;
 
     void displayBatteryLevel(float);
     void updateScreen();
@@ -74,7 +76,10 @@ private:
     void drainBattery();
     void changeBattery(float);
 
-    void changeBatteryAsAdmin();
+    void softOff();
+    void delay(float);
+    void barSingleLight(int);
+
 
 private slots:
     void updateTimer();
@@ -84,6 +89,6 @@ private slots:
     void toggleIntensityDown();
     void startSession();
     void changeConnection();
-
+    void earConnect(int);
 };
 #endif // MAINWINDOW_H
