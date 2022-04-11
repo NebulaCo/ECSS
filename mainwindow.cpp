@@ -6,10 +6,16 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
 
+//    QPixmap checkButtonImage (":/images/symbols/buttons/check");
+//    ui->checkButtonImage->setPixmap(checkButtonImage);
 
     connect(ui->powerButton, SIGNAL(pressed()), this, SLOT(checkPress()));
     connect(ui->intensityUpButton, SIGNAL(pressed()), this, SLOT(checkPress()));
     connect(ui->intensityDownButton, SIGNAL(pressed()), this, SLOT(checkPress()));
+    connect(ui->durationUpButton, SIGNAL(pressed()), this, SLOT(toggleDurationUp()));
+    connect(ui->durationDownButton, SIGNAL(pressed()), this, SLOT(toggleDurationDown()));
+
+    connect(ui->recordButton, SIGNAL(pressed()), this, SLOT(toggleRecording()));
 
 
     connect(ui->powerButton, SIGNAL(released()), this, SLOT(togglePowerButton()));
@@ -17,15 +23,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->intensityDownButton, SIGNAL(released()), this, SLOT(toggleIntensityDown()));
 
     connect(ui->checkButton, SIGNAL(released()), this, SLOT(startSession()));
-    powerStatus = false;
 
+    powerStatus = false;
+    recordSession = false;
+    userSessionTime = 60;
     //Admin
 
 
     battery = 100.0;
     //battery level spinbox
-
-    // TODO: fix this connect (causing battery to become 0)
     connect(ui->batterySpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::changeBattery);
 
     //connection spin box
@@ -43,6 +49,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     pi_scene = new QGraphicsScene(this);
     ui->powerIndicator->setScene(pi_scene);
+
+    rec_scene = new QGraphicsScene(this);
+    ui->recordIndicator->setScene(rec_scene);
 
     initalizeVectors();
     initializeScreen();
@@ -96,6 +105,7 @@ void MainWindow::initializeScreen(){
         QPixmap groupOff (":/images/symbols/groups/group" + str + "off.png");
         groupVector.at(i)->setPixmap(groupOff.scaled(75, 100, Qt::KeepAspectRatio));
     }
+    ui->group3Screen->setNum(userSessionTime);
 
     for (i = 0; i < sessionVector.size(); i++){
         str = QString::number(i+1);
@@ -182,6 +192,21 @@ void MainWindow::updateScreen(){
             sessionVector.at(i)->setPixmap(sessionOff.scaled(75,100, Qt::KeepAspectRatio));
 
         }
+    }
+
+}
+
+void MainWindow::toggleRecording(){
+    if (powerStatus){
+        recordSession = recordSession ? false: true;
+        if (recordSession){
+            rec_scene->setBackgroundBrush(Qt::green);
+
+        } else {
+            rec_scene->setBackgroundBrush(Qt::white);
+
+        }
+
     }
 
 }
@@ -287,13 +312,42 @@ void MainWindow::toggleIntensityDown(){
     }
 }
 
+void MainWindow::toggleDurationUp(){
+    if (powerStatus){
+        currentGroup = 2;
+        updateScreen();
+        userSessionTime = (userSessionTime + 5 > MAX_SESSION_LENGTH) ? MAX_SESSION_LENGTH : userSessionTime + 5;
+        ui->group3Screen->setNum(userSessionTime);
+    }
+}
+
+void MainWindow::toggleDurationDown(){
+    if (powerStatus){
+        currentGroup = 2;
+        updateScreen();
+        userSessionTime = (userSessionTime - 5 < 0) ? 0 : userSessionTime - 5;
+        ui->group3Screen->setNum(userSessionTime);
+    }
+}
+
 void MainWindow::startSession(){
     qInfo() << "checking canStartSession";
     if (canStartSession()){
+        //todo
         flashSelectedSession(currentSessionType);
-        Session* ses = new Session(1,"heal",8);
+
+        int duration = ui->group3Screen->text().toInt();
+        Session* ses = new Session(currentIntensity, currentSessionType, duration);
+
         currentSession = ses;
         sessionRunning = true;
+
+        //If they want to record it, append to array. If not, skip
+        if (recordSession){
+            qInfo() << "Session being saved";
+            sessionHistory.append(currentSession);
+        }
+
 
         //start timer
         initTimer(ses->getTimer());
@@ -307,10 +361,15 @@ void MainWindow::initTimer(QTimer* t) {
     if (connection == 2 || connection == 3) {
         t->start(1000);
     } else {
+        //todo: Stop timer
+
         //bad connection
+        qInfo() << 'Please get a better connection.';
     }
 
 }
+
+
 
 void MainWindow::updateTimer(){
 

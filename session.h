@@ -10,7 +10,7 @@ class Session: public QObject{
     Q_OBJECT
 
     public:
-        Session(int i, QString sT, int t);
+        Session(int i, int sT, int t);
         ~Session();
         int getIntensityLvl() const;
         QString getSessionType() const;
@@ -26,6 +26,7 @@ private:
         QTimer* timer;
         int duration;
         int timeLeft;
+        void setSessionType(int);
 
 
 };
