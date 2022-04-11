@@ -38,5 +38,7 @@
         <file>symbols/sessions/session7on.png</file>
         <file>symbols/sessions/session8off.png</file>
         <file>symbols/sessions/session8on.png</file>
+        <file>symbols/buttons/record.png</file>
+        <file>symbols/buttons/check.png</file>
     </qresource>
 </RCC>
