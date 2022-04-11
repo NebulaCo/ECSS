@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1325</width>
+    <width>1242</width>
     <height>562</height>
    </rect>
   </property>
@@ -196,7 +196,7 @@
         <rect>
          <x>150</x>
          <y>50</y>
-         <width>261</width>
+         <width>271</width>
          <height>51</height>
         </rect>
        </property>
@@ -225,7 +225,7 @@
         <item>
          <widget class="QLabel" name="group3Screen">
           <property name="text">
-           <string>TextLabel</string>
+           <string/>
           </property>
          </widget>
         </item>
@@ -411,29 +411,29 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>500</width>
+        <width>400</width>
         <height>500</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>500</width>
+        <width>400</width>
         <height>500</height>
        </size>
       </property>
       <property name="baseSize">
        <size>
-        <width>500</width>
+        <width>400</width>
         <height>500</height>
        </size>
       </property>
       <widget class="QWidget" name="gridLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>60</y>
+         <x>0</x>
+         <y>20</y>
          <width>401</width>
-         <height>221</height>
+         <height>141</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
@@ -631,7 +631,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1325</width>
+     <width>1242</width>
      <height>22</height>
     </rect>
    </property>

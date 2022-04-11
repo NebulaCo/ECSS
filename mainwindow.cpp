@@ -105,7 +105,6 @@ void MainWindow::initializeScreen(){
         QPixmap groupOff (":/images/symbols/groups/group" + str + "off.png");
         groupVector.at(i)->setPixmap(groupOff.scaled(75, 100, Qt::KeepAspectRatio));
     }
-    ui->group3Screen->setNum(userSessionTime);
 
     for (i = 0; i < sessionVector.size(); i++){
         str = QString::number(i+1);
@@ -152,6 +151,7 @@ void MainWindow::updateScreen(){
             QPixmap groupOff (":/images/symbols/groups/group" + str + "off.png");
             groupVector.at(i)->setPixmap(groupOff.scaled(75, 100, Qt::KeepAspectRatio));
         }
+        ui->group3Screen->clear();
         return;
     }
     if (currentGroup != -1){
@@ -193,6 +193,7 @@ void MainWindow::updateScreen(){
 
         }
     }
+    ui->group3Screen->setNum(userSessionTime);
 
 }
 
@@ -315,18 +316,16 @@ void MainWindow::toggleIntensityDown(){
 void MainWindow::toggleDurationUp(){
     if (powerStatus){
         currentGroup = 2;
-        updateScreen();
         userSessionTime = (userSessionTime + 5 > MAX_SESSION_LENGTH) ? MAX_SESSION_LENGTH : userSessionTime + 5;
-        ui->group3Screen->setNum(userSessionTime);
+        updateScreen();
     }
 }
 
 void MainWindow::toggleDurationDown(){
     if (powerStatus){
         currentGroup = 2;
+        userSessionTime = (userSessionTime - 5 < MIN_SESSION_LENGTH) ? MIN_SESSION_LENGTH : userSessionTime - 5;
         updateScreen();
-        userSessionTime = (userSessionTime - 5 < 0) ? 0 : userSessionTime - 5;
-        ui->group3Screen->setNum(userSessionTime);
     }
 }
 
@@ -336,7 +335,15 @@ void MainWindow::startSession(){
         //todo
         flashSelectedSession(currentSessionType);
 
-        int duration = ui->group3Screen->text().toInt();
+
+        int duration;
+        if (currentGroup == 2){
+            duration = ui->group3Screen->text().toInt();
+        } else if (currentGroup == 0){
+            duration = 20;
+        } else {
+            duration = 45;
+        }
         Session* ses = new Session(currentIntensity, currentSessionType, duration);
 
         currentSession = ses;
