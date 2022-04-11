@@ -40,5 +40,8 @@
         <file>symbols/sessions/session8on.png</file>
         <file>symbols/buttons/record.png</file>
         <file>symbols/buttons/check.png</file>
+        <file>symbols/buttons/down.png</file>
+        <file>symbols/buttons/power.png</file>
+        <file>symbols/buttons/up.png</file>
     </qresource>
 </RCC>

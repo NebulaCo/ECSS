@@ -202,14 +202,13 @@ void MainWindow::toggleRecording(){
         recordSession = recordSession ? false: true;
         if (recordSession){
             rec_scene->setBackgroundBrush(Qt::green);
-
         } else {
             rec_scene->setBackgroundBrush(Qt::white);
-
         }
-
+    } else {
+        recordSession = false;
+        rec_scene->setBackgroundBrush(Qt::white);
     }
-
 }
 
 void MainWindow::togglePowerButton(){
@@ -220,8 +219,8 @@ void MainWindow::togglePowerButton(){
             qInfo() << "battery: " + QString::number(battery);
             pi_scene->setBackgroundBrush(Qt::green);
             displayBatteryLevel(battery);
+            ui->group3Screen->setNum(userSessionTime);
             updateScreen();
-
 
         } else {
             qInfo() << "Machine turned off.";
@@ -236,10 +235,14 @@ void MainWindow::togglePowerButton(){
 
 void MainWindow::turnOff(){
     pi_scene->setBackgroundBrush(Qt::white);
+    recordSession = false;
+    toggleRecording();
+
     connection = -1;
     currentGroup = -1;
-    currentIntensity = 0;
     currentSessionType = -1;
+    currentIntensity = 0;
+    ui->group3Screen->clear();
 
     displayBatteryLevel(0);
     updateScreen();
@@ -394,8 +397,7 @@ void MainWindow::updateTimer(){
     }
 }
 
-void MainWindow::drainBattery()
-{
+void MainWindow::drainBattery(){
     // 1 minute == 1 second
     qInfo() << "drain battery function call: ";
 
