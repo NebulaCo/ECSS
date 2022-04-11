@@ -105,7 +105,6 @@ void MainWindow::initializeScreen(){
         QPixmap groupOff (":/images/symbols/groups/group" + str + "off.png");
         groupVector.at(i)->setPixmap(groupOff.scaled(75, 100, Qt::KeepAspectRatio));
     }
-    ui->group3Screen->setNum(userSessionTime);
 
     for (i = 0; i < sessionVector.size(); i++){
         str = QString::number(i+1);
@@ -201,14 +200,13 @@ void MainWindow::toggleRecording(){
         recordSession = recordSession ? false: true;
         if (recordSession){
             rec_scene->setBackgroundBrush(Qt::green);
-
         } else {
             rec_scene->setBackgroundBrush(Qt::white);
-
         }
-
+    } else {
+        recordSession = false;
+        rec_scene->setBackgroundBrush(Qt::white);
     }
-
 }
 
 void MainWindow::togglePowerButton(){
@@ -219,8 +217,8 @@ void MainWindow::togglePowerButton(){
             qInfo() << "battery: " + QString::number(battery);
             pi_scene->setBackgroundBrush(Qt::green);
             displayBatteryLevel(battery);
+            ui->group3Screen->setNum(userSessionTime);
             updateScreen();
-
 
         } else {
             qInfo() << "Machine turned off.";
@@ -235,10 +233,14 @@ void MainWindow::togglePowerButton(){
 
 void MainWindow::turnOff(){
     pi_scene->setBackgroundBrush(Qt::white);
+    recordSession = false;
+    toggleRecording();
+
     connection = -1;
     currentGroup = -1;
-    currentIntensity = 0;
     currentSessionType = -1;
+    currentIntensity = 0;
+    ui->group3Screen->clear();
 
     displayBatteryLevel(0);
     updateScreen();
@@ -387,8 +389,7 @@ void MainWindow::updateTimer(){
     }
 }
 
-void MainWindow::drainBattery()
-{
+void MainWindow::drainBattery(){
     // 1 minute == 1 second
     qInfo() << "drain battery function call: ";
 
