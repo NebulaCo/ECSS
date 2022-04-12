@@ -7,6 +7,8 @@
 #include <QVector>
 #include <QLabel>
 #include <QTime>
+#include <QListWidget>
+#include <QDebug>
 
 #include "session.h"
 
@@ -43,6 +45,7 @@ private:
 
     //todo: Vector of sessions
     QVector <Session*> sessionHistory;
+    QStringList sessionHistoryView;
 
 
     int currentGroup;
@@ -61,6 +64,12 @@ private:
     QGraphicsScene *rec_scene;
     QTimer* temp;
 
+
+    QListWidget *activeQListWidget;
+
+
+
+
     float battery;
     double userSessionTime;
 
@@ -71,6 +80,7 @@ private:
     int blinkTimeLeft = 6;
 
     void displayBarLevel(int);
+    void displayBattery(float);
     void updateScreen();
 
 
@@ -95,6 +105,9 @@ private:
     void blinkBadConnection();
     void resumeSession();
     void pauseSession();
+
+    void updateTreatmentHistory();
+
 
 private slots:
     void updateTimer();

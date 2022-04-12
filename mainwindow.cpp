@@ -1,7 +1,6 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
@@ -14,22 +13,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->intensityDownButton, SIGNAL(pressed()), this, SLOT(checkPress()));
     connect(ui->durationUpButton, SIGNAL(pressed()), this, SLOT(toggleDurationUp()));
     connect(ui->durationDownButton, SIGNAL(pressed()), this, SLOT(toggleDurationDown()));
-
     connect(ui->recordButton, SIGNAL(pressed()), this, SLOT(toggleRecording()));
-
 
     connect(ui->powerButton, SIGNAL(released()), this, SLOT(togglePowerButton()));
     connect(ui->intensityUpButton, SIGNAL(released()), this, SLOT(toggleIntensityUp()));
     connect(ui->intensityDownButton, SIGNAL(released()), this, SLOT(toggleIntensityDown()));
-
     connect(ui->checkButton, SIGNAL(released()), this, SLOT(startSession()));
 
     powerStatus = false;
     recordSession = false;
     userSessionTime = 60;
     //Admin
-
-
     battery = 100.0;
     //battery level spinbox
     connect(ui->batterySpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::changeBattery);
@@ -53,12 +47,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     rec_scene = new QGraphicsScene(this);
     ui->recordIndicator->setScene(rec_scene);
 
+    activeQListWidget = ui->historyListView;
+    activeQListWidget->addItems(sessionHistoryView);
+    activeQListWidget->setCurrentRow(0);
+
+
     initalizeVectors();
     updateScreen();
-
-
-//    QPixmap rtb (":/images/symbols/sessions/Red_TOP_R.png");
-//    ui->rightTopBar->setPixmap(rtb.scaled(50, 50, Qt::KeepAspectRatio));
 
 }
 
@@ -147,7 +142,7 @@ void MainWindow::updateScreen(){
         ui->duty_CES_label->setPixmap(duty_CES.scaled(75, 100, Qt::KeepAspectRatio));
 
         rec_scene->setBackgroundBrush(Qt::white);
-
+        updateTreatmentHistory();
         return;
     }
     if (currentGroup != -1){
@@ -214,7 +209,7 @@ void MainWindow::toggleRecording(){
 }
 
 void MainWindow::togglePowerButton(){
-    if (buttonTimer.elapsed() >= 1000){
+    if (buttonTimer.elapsed() >= 2000){
         powerStatus = powerStatus ? false: true;
         if (powerStatus) {
             qInfo() << "Machine turned on.";
@@ -224,6 +219,7 @@ void MainWindow::togglePowerButton(){
             changeConnection();
             ui->group3Screen->setNum(userSessionTime);
             updateScreen();
+
 
         } else {
             qInfo() << "Machine turned off.";
@@ -285,6 +281,13 @@ void MainWindow::displayBarSingleLight(int bar){
     }
 }
 
+void MainWindow::updateTreatmentHistory(){
+    activeQListWidget->clear();
+    activeQListWidget->addItems(sessionHistoryView);
+    activeQListWidget->setCurrentRow(0);
+
+}
+
 
 void MainWindow::toggleIntensityUp(){
     if (powerStatus){
@@ -317,7 +320,8 @@ void MainWindow::toggleIntensityDown(){
             displayBarSingleLight(currentIntensity);
 
         } else {
-            currentSessionType = (currentSessionType == 0) ? SESSION_TYPE_COUNT - 1  : --currentSessionType;
+
+            currentSessionType = (currentSessionType <= 0) ? SESSION_TYPE_COUNT - 1  : --currentSessionType;
             updateScreen();
         }
     }
@@ -388,6 +392,7 @@ void MainWindow::updateTimer(){
         //If they want to record it, append to array. If not, skip
         if (recordSession){
             qInfo() << "Session being saved";
+            sessionHistoryView.append(currentSession->toString());
             sessionHistory.append(currentSession);
         }
         currentSession = nullptr;

@@ -21,6 +21,8 @@ class Session: public QObject{
         void decrementTimeLeft();
         void setTimeLeft(int);
 
+        QString toString();
+
 private:
         int intensityLevel;
         QString sessionType;

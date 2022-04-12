@@ -1,4 +1,5 @@
 #include "session.h"
+#include <QDebug>
 
 Session::Session(int i, int sesh, int t) {
     intensityLevel = i;
@@ -67,5 +68,14 @@ void Session::setTimeLeft(int t){
     timeLeft = t;
 }
 
+QString Session::toString(){
 
+    QString q1 = sessionType.leftJustified(8 , ' ') + "| ";
+    QString q2 = QString::number(duration).leftJustified(10, ' ') + "| ";
+    QString q3 = QString::number(intensityLevel);
+
+    QString toStr = q1 + q2 + q3;
+
+    return toStr;
+}
 

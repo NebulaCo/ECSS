@@ -505,6 +505,79 @@
         </item>
        </layout>
       </widget>
+      <widget class="QGraphicsView" name="treatementHistory">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>350</y>
+         <width>171</width>
+         <height>90</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(243, 243, 243);</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="backgroundBrush">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </property>
+      </widget>
+      <widget class="QListWidget" name="historyListView">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>350</y>
+         <width>171</width>
+         <height>90</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="menuLabel">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>330</y>
+         <width>171</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(52, 101, 164);
+color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>Session | Duration | Intensity</string>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
      </widget>
     </item>
     <item>
