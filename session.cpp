@@ -63,5 +63,9 @@ void Session::setSessionType(int sesh){
 
 }
 
+void Session::setTimeLeft(int t){
+    timeLeft = t;
+}
+
 
 

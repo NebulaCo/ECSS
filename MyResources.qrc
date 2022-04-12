@@ -43,5 +43,14 @@
         <file>symbols/buttons/down.png</file>
         <file>symbols/buttons/power.png</file>
         <file>symbols/buttons/up.png</file>
+        <file>symbols/staticgraphics/INT.png</file>
+        <file>symbols/staticgraphics/left_CES_off.png</file>
+        <file>symbols/staticgraphics/left_CES_on.png</file>
+        <file>symbols/staticgraphics/right_CES_on.png</file>
+        <file>symbols/staticgraphics/right_CES_off.png</file>
+        <file>symbols/staticgraphics/short_CES_on.png</file>
+        <file>symbols/staticgraphics/short_CES_off.png</file>
+        <file>symbols/staticgraphics/duty_cycle_CES_on.png</file>
+        <file>symbols/staticgraphics/duty_cycle_CES_off.png</file>
     </qresource>
 </RCC>

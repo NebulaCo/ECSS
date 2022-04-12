@@ -66,12 +66,11 @@ private:
     Session* currentSession;
     bool sessionRunning;
 
-    void displayBatteryLevel(float);
+    void displayBarLevel(int);
     void updateScreen();
 
 
     void initalizeVectors();
-    void initializeScreen();
 
     bool connectionTest();
     void badConnection();
@@ -87,7 +86,7 @@ private:
 
     void softOff();
     void delay(float);
-    void barSingleLight(int);
+    void displayBarSingleLight(int);
 
 
 private slots:
@@ -100,7 +99,7 @@ private slots:
     void toggleDurationDown();
     void startSession();
     void changeConnection();
-    void earConnect(int);
+    void earConnect();
     void toggleRecording();
 
 };

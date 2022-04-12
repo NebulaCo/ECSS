@@ -19,6 +19,7 @@ class Session: public QObject{
         void setIntensity(int i);
         QTimer* getTimer() const;
         void decrementTimeLeft();
+        void setTimeLeft(int);
 
 private:
         int intensityLevel;

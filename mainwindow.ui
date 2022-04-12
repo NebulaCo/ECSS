@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1242</width>
+    <width>1228</width>
     <height>562</height>
    </rect>
   </property>
@@ -158,8 +158,8 @@
         <rect>
          <x>20</x>
          <y>140</y>
-         <width>491</width>
-         <height>41</height>
+         <width>581</width>
+         <height>51</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -449,6 +449,62 @@
         </size>
        </property>
       </widget>
+      <widget class="QLabel" name="label">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>250</y>
+         <width>41</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="MyResources.qrc">:/images/symbols/staticgraphics/INT.png</pixmap>
+       </property>
+      </widget>
+      <widget class="QWidget" name="gridLayoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>580</x>
+         <y>40</y>
+         <width>160</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="1">
+         <widget class="QLabel" name="duty_CES_label">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="short_CES_label">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="left_CES_label">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="right_CES_label">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
     <item>
@@ -461,7 +517,7 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>400</width>
+        <width>300</width>
         <height>500</height>
        </size>
       </property>
@@ -473,25 +529,143 @@
       </property>
       <property name="baseSize">
        <size>
-        <width>400</width>
+        <width>300</width>
         <height>500</height>
        </size>
       </property>
       <widget class="QWidget" name="gridLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>20</y>
-         <width>401</width>
-         <height>141</height>
+         <x>10</x>
+         <y>30</y>
+         <width>291</width>
+         <height>163</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
+        <item row="2" column="0">
+         <widget class="QLabel" name="leftEarLabel">
+          <property name="text">
+           <string>Left ear attached</string>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="0">
          <widget class="QLabel" name="rightEarLabel">
           <property name="text">
            <string>Right ear attached</string>
           </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="connectionLalbel">
+          <property name="text">
+           <string>Connection</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="batterLabel">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="font">
+           <font>
+            <kerning>false</kerning>
+           </font>
+          </property>
+          <property name="text">
+           <string>Battery</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="rightEarComboBox">
+          <property name="minimumSize">
+           <size>
+            <width>82</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>82</width>
+            <height>30</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string>False</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>True</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="batterySpinBox">
+          <property name="minimumSize">
+           <size>
+            <width>82</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>82</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="prefix">
+           <string/>
+          </property>
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          <property name="decimals">
+           <number>2</number>
+          </property>
+          <property name="maximum">
+           <double>100.000000000000000</double>
+          </property>
+          <property name="stepType">
+           <enum>QAbstractSpinBox::DefaultStepType</enum>
+          </property>
+          <property name="value">
+           <double>100.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="leftEarComboBox">
+          <property name="minimumSize">
+           <size>
+            <width>82</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>82</width>
+            <height>30</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string>False</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>True</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item row="1" column="1">
@@ -552,124 +726,6 @@
           </item>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QDoubleSpinBox" name="batterySpinBox">
-          <property name="minimumSize">
-           <size>
-            <width>82</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>82</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="prefix">
-           <string/>
-          </property>
-          <property name="suffix">
-           <string>%</string>
-          </property>
-          <property name="decimals">
-           <number>2</number>
-          </property>
-          <property name="maximum">
-           <double>100.000000000000000</double>
-          </property>
-          <property name="stepType">
-           <enum>QAbstractSpinBox::DefaultStepType</enum>
-          </property>
-          <property name="value">
-           <double>100.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="batterLabel">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="font">
-           <font>
-            <kerning>false</kerning>
-           </font>
-          </property>
-          <property name="text">
-           <string>Battery</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="leftEarLabel">
-          <property name="text">
-           <string>Left ear attached</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QComboBox" name="leftEarComboBox">
-          <property name="minimumSize">
-           <size>
-            <width>82</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>82</width>
-            <height>30</height>
-           </size>
-          </property>
-          <item>
-           <property name="text">
-            <string>False</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>True</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QComboBox" name="rightEarComboBox">
-          <property name="minimumSize">
-           <size>
-            <width>82</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>82</width>
-            <height>30</height>
-           </size>
-          </property>
-          <item>
-           <property name="text">
-            <string>False</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>True</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="connectionLalbel">
-          <property name="text">
-           <string>Connection</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
      </widget>
@@ -681,7 +737,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1242</width>
+     <width>1228</width>
      <height>22</height>
     </rect>
    </property>
