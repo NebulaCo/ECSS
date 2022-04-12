@@ -1,7 +1,6 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
@@ -14,22 +13,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->intensityDownButton, SIGNAL(pressed()), this, SLOT(checkPress()));
     connect(ui->durationUpButton, SIGNAL(pressed()), this, SLOT(toggleDurationUp()));
     connect(ui->durationDownButton, SIGNAL(pressed()), this, SLOT(toggleDurationDown()));
-
     connect(ui->recordButton, SIGNAL(pressed()), this, SLOT(toggleRecording()));
-
 
     connect(ui->powerButton, SIGNAL(released()), this, SLOT(togglePowerButton()));
     connect(ui->intensityUpButton, SIGNAL(released()), this, SLOT(toggleIntensityUp()));
     connect(ui->intensityDownButton, SIGNAL(released()), this, SLOT(toggleIntensityDown()));
-
     connect(ui->checkButton, SIGNAL(released()), this, SLOT(startSession()));
 
     powerStatus = false;
     recordSession = false;
     userSessionTime = 60;
     //Admin
-
-
     battery = 100.0;
     //battery level spinbox
     connect(ui->batterySpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::changeBattery);
@@ -53,12 +47,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     rec_scene = new QGraphicsScene(this);
     ui->recordIndicator->setScene(rec_scene);
 
+    activeQListWidget = ui->historyListView;
+    activeQListWidget->addItems(sessionHistoryView);
+    activeQListWidget->setCurrentRow(0);
+
+
     initalizeVectors();
-    initializeScreen();
-
-
-//    QPixmap rtb (":/images/symbols/sessions/Red_TOP_R.png");
-//    ui->rightTopBar->setPixmap(rtb.scaled(50, 50, Qt::KeepAspectRatio));
+    updateScreen();
 
 }
 
@@ -91,31 +86,9 @@ void MainWindow::initalizeVectors(){
 
 }
 
-void MainWindow::initializeScreen(){
-    QString str;
-    int i;
-    for (i = 0; i < barVector.size(); i++){
-        str = QString::number(i+1);
-        QPixmap numOff (":/images/symbols/bars/bar" + str + "off.png");
-        barVector.at(i)->setPixmap(numOff.scaled(50, 100, Qt::KeepAspectRatio));
-    }
+void MainWindow::displayBarLevel(int bars){
 
-    for (i = 0; i < groupVector.size(); i++){
-        str = QString::number(i+1);
-        QPixmap groupOff (":/images/symbols/groups/group" + str + "off.png");
-        groupVector.at(i)->setPixmap(groupOff.scaled(75, 100, Qt::KeepAspectRatio));
-    }
-
-    for (i = 0; i < sessionVector.size(); i++){
-        str = QString::number(i+1);
-        QPixmap sessionOff (":/images/symbols/sessions/session" + str + "off.png");
-        sessionVector.at(i)->setPixmap(sessionOff.scaled(75, 50, Qt::KeepAspectRatio));
-    }
-}
-
-void MainWindow::displayBatteryLevel(float battery){
-
-    int bars = int(battery / 12.5);
+//    int bars = int(battery / 12.5);
     QString str;
     int i;
     for (i = 0; i < bars; i++){
@@ -151,6 +124,25 @@ void MainWindow::updateScreen(){
             QPixmap groupOff (":/images/symbols/groups/group" + str + "off.png");
             groupVector.at(i)->setPixmap(groupOff.scaled(75, 100, Qt::KeepAspectRatio));
         }
+        ui->group3Screen->clear();
+
+        for (i = 0; i < barVector.size(); i++){
+            str = QString::number(i+1);
+            QPixmap numOff (":/images/symbols/bars/bar" + str + "off.png");
+            barVector.at(i)->setPixmap(numOff.scaled(50, 100, Qt::KeepAspectRatio));
+        }
+
+        QPixmap left_CES (":/images/symbols/staticgraphics/left_CES_off.png");
+        QPixmap right_CES (":/images/symbols/staticgraphics/right_CES_off.png");
+        QPixmap short_CES (":/images/symbols/staticgraphics/short_CES_off.png");
+        QPixmap duty_CES (":/images/symbols/staticgraphics/duty_cycle_CES_off.png");
+        ui->left_CES_label->setPixmap(left_CES.scaled(75, 100, Qt::KeepAspectRatio));
+        ui->right_CES_label->setPixmap(right_CES.scaled(75, 100, Qt::KeepAspectRatio));
+        ui->short_CES_label->setPixmap(short_CES.scaled(75, 100, Qt::KeepAspectRatio));
+        ui->duty_CES_label->setPixmap(duty_CES.scaled(75, 100, Qt::KeepAspectRatio));
+
+        rec_scene->setBackgroundBrush(Qt::white);
+        updateTreatmentHistory();
         return;
     }
     if (currentGroup != -1){
@@ -193,19 +185,26 @@ void MainWindow::updateScreen(){
         }
     }
 
+
+    ui->group3Screen->setNum(userSessionTime);
+
 }
 
 void MainWindow::toggleRecording(){
-    if (powerStatus){
-        recordSession = recordSession ? false: true;
-        if (recordSession){
-            rec_scene->setBackgroundBrush(Qt::green);
+    if (sessionRunning == true){
+        if (powerStatus){
+            recordSession = recordSession ? false: true;
+            if (recordSession){
+                rec_scene->setBackgroundBrush(Qt::green);
+            } else {
+                rec_scene->setBackgroundBrush(Qt::white);
+            }
         } else {
+            recordSession = false;
             rec_scene->setBackgroundBrush(Qt::white);
         }
     } else {
-        recordSession = false;
-        rec_scene->setBackgroundBrush(Qt::white);
+        qInfo() << "No session running, cant record";
     }
 }
 
@@ -216,12 +215,19 @@ void MainWindow::togglePowerButton(){
             qInfo() << "Machine turned on.";
             qInfo() << "battery: " + QString::number(battery);
             pi_scene->setBackgroundBrush(Qt::green);
-            displayBatteryLevel(battery);
+            displayBarLevel(int(battery/12.5));
+            changeConnection();
             ui->group3Screen->setNum(userSessionTime);
             updateScreen();
 
+
         } else {
             qInfo() << "Machine turned off.";
+            if (sessionRunning){
+                currentSession->setTimeLeft(0);
+                currentSession->getTimer()->stop();
+                currentSession->getTimer()->disconnect();
+            }
             turnOff();
         }
     } else if (powerStatus){
@@ -234,22 +240,20 @@ void MainWindow::togglePowerButton(){
 void MainWindow::turnOff(){
     pi_scene->setBackgroundBrush(Qt::white);
     recordSession = false;
-    toggleRecording();
-
+    sessionRunning = false;
     connection = -1;
     currentGroup = -1;
     currentSessionType = -1;
     currentIntensity = 0;
-    ui->group3Screen->clear();
 
-    displayBatteryLevel(0);
+    displayBarLevel(0);
     updateScreen();
 }
 
 void MainWindow::softOff(){
     qInfo() << "doing softoff";
     while (currentIntensity > 0){
-        barSingleLight(currentIntensity);
+        displayBarSingleLight(currentIntensity);
         currentIntensity--;
         delay(1);
     }
@@ -262,7 +266,7 @@ void MainWindow::delay(float delayDuration){
     }
 }
 
-void MainWindow::barSingleLight(int bar){
+void MainWindow::displayBarSingleLight(int bar){
     QString str;
     for (int i = 0; i < BAR_COUNT; i++){
         if ((bar - 1) == i){
@@ -277,38 +281,47 @@ void MainWindow::barSingleLight(int bar){
     }
 }
 
+void MainWindow::updateTreatmentHistory(){
+    activeQListWidget->clear();
+    activeQListWidget->addItems(sessionHistoryView);
+    activeQListWidget->setCurrentRow(0);
+
+}
+
 
 void MainWindow::toggleIntensityUp(){
     if (powerStatus){
 
-        if (sessionRunning == true){
+        if (sessionRunning){
             //change intensity
             currentIntensity++;
             if (currentIntensity > 8){
                 currentIntensity = 8;
             }
             currentSession->setIntensity(currentIntensity);
+            displayBarLevel(currentIntensity);
         } else {
             currentSessionType = (currentSessionType == SESSION_TYPE_COUNT-1) ? 0 : ++currentSessionType;
             updateScreen();
         }
-
     }
 }
 
 void MainWindow::toggleIntensityDown(){
     if (powerStatus){
 
-        if (sessionRunning == true){
+        if (sessionRunning){
             //change intensity
             currentIntensity--;
             if (currentIntensity < 1){
                 currentIntensity = 1;
             }
             currentSession->setIntensity(currentIntensity);
+            displayBarLevel(currentIntensity);
 
         } else {
-            currentSessionType = (currentSessionType == 0) ? SESSION_TYPE_COUNT - 1  : --currentSessionType;
+
+            currentSessionType = (currentSessionType <= 0) ? SESSION_TYPE_COUNT - 1  : --currentSessionType;
             updateScreen();
         }
     }
@@ -317,18 +330,16 @@ void MainWindow::toggleIntensityDown(){
 void MainWindow::toggleDurationUp(){
     if (powerStatus){
         currentGroup = 2;
-        updateScreen();
         userSessionTime = (userSessionTime + 5 > MAX_SESSION_LENGTH) ? MAX_SESSION_LENGTH : userSessionTime + 5;
-        ui->group3Screen->setNum(userSessionTime);
+        updateScreen();
     }
 }
 
 void MainWindow::toggleDurationDown(){
     if (powerStatus){
         currentGroup = 2;
+        userSessionTime = (userSessionTime - 5 < MIN_SESSION_LENGTH) ? MIN_SESSION_LENGTH : userSessionTime - 5;
         updateScreen();
-        userSessionTime = (userSessionTime - 5 < 0) ? 0 : userSessionTime - 5;
-        ui->group3Screen->setNum(userSessionTime);
     }
 }
 
@@ -338,21 +349,25 @@ void MainWindow::startSession(){
         //todo
         flashSelectedSession(currentSessionType);
 
-        int duration = ui->group3Screen->text().toInt();
+
+        int duration;
+        if (currentGroup == 2){
+            duration = ui->group3Screen->text().toInt();
+        } else if (currentGroup == 0){
+            duration = 20;
+        } else {
+            duration = 45;
+        }
         Session* ses = new Session(currentIntensity, currentSessionType, duration);
 
         currentSession = ses;
         sessionRunning = true;
 
-        //If they want to record it, append to array. If not, skip
-        if (recordSession){
-            qInfo() << "Session being saved";
-            sessionHistory.append(currentSession);
-        }
-
 
         //start timer
         initTimer(ses->getTimer());
+    } else {
+        qInfo() << "cannot start session";
     }
 }
 
@@ -382,11 +397,24 @@ void MainWindow::updateTimer(){
     if (currentSession->getTimeLeft() == 0){
         currentSession->getTimer()->stop();
         currentSession->getTimer()->disconnect();
+
+        //If they want to record it, append to array. If not, skip
+        if (recordSession){
+            qInfo() << "Session being saved";
+            qInfo() << currentSession->toString();
+            sessionHistoryView.append(currentSession->toString());
+            sessionHistory.append(currentSession);
+        }
         currentSession = nullptr;
         sessionRunning = false;
+        powerStatus = false;
+
+
         softOff();
         turnOff();
     }
+
+
 }
 
 void MainWindow::drainBattery(){
@@ -514,9 +542,9 @@ bool MainWindow::canStartSession(){
 void MainWindow::flashSelectedSession(int session){
     for (int i = 0; i < 6; i++){
         if (i % 2 == 0){
-            barSingleLight(session+1);
+            displayBarSingleLight(session+1);
         } else {
-            barSingleLight(0);
+            displayBarSingleLight(0);
         }
         delay(0.4);
     }
@@ -533,12 +561,29 @@ void MainWindow::changeConnection(){
     }
 }
 
-void MainWindow::earConnect(int val){
+void MainWindow::earConnect(){
     if (ui->leftEarComboBox->currentText() == "True" && ui->rightEarComboBox->currentText() == "True"){
         if (ui->connectionComboBox->currentText() == "Bad"){
             ui->connectionComboBox->setCurrentIndex(1);
         }
     } else {
         ui->connectionComboBox->setCurrentIndex(0);
+    }
+    if (powerStatus){
+        if (ui->leftEarComboBox->currentText() == "True"){
+            QPixmap left_CES (":/images/symbols/staticgraphics/left_CES_on.png");
+            ui->left_CES_label->setPixmap(left_CES.scaled(75, 100, Qt::KeepAspectRatio));
+        } else {
+            QPixmap left_CES (":/images/symbols/staticgraphics/left_CES_off.png");
+            ui->left_CES_label->setPixmap(left_CES.scaled(75, 100, Qt::KeepAspectRatio));
+        }
+
+        if (ui->rightEarComboBox->currentText() == "True"){
+            QPixmap right_CES (":/images/symbols/staticgraphics/right_CES_on.png");
+            ui->right_CES_label->setPixmap(right_CES.scaled(75, 100, Qt::KeepAspectRatio));
+        } else {
+            QPixmap right_CES (":/images/symbols/staticgraphics/right_CES_off.png");
+            ui->right_CES_label->setPixmap(right_CES.scaled(75, 100, Qt::KeepAspectRatio));
+        }
     }
 }

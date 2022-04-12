@@ -7,6 +7,8 @@
 #include <QVector>
 #include <QLabel>
 #include <QTime>
+#include <QListWidget>
+#include <QDebug>
 
 #include "session.h"
 
@@ -15,6 +17,7 @@
 #define SESSION_TYPE_COUNT 8
 #define MAX_INTENSITY 8
 #define MAX_SESSION_LENGTH 180
+#define MIN_SESSION_LENGTH 5
 
 
 QT_BEGIN_NAMESPACE
@@ -42,6 +45,7 @@ private:
 
     //todo: Vector of sessions
     QVector <Session*> sessionHistory;
+    QStringList sessionHistoryView;
 
 
     int currentGroup;
@@ -59,18 +63,23 @@ private:
     //Record indicator scene
     QGraphicsScene *rec_scene;
 
+
+    QListWidget *activeQListWidget;
+
+
+
+
     float battery;
     double userSessionTime;
 
     Session* currentSession;
     bool sessionRunning;
 
-    void displayBatteryLevel(float);
+    void displayBarLevel(int);
     void updateScreen();
 
 
     void initalizeVectors();
-    void initializeScreen();
 
     bool connectionTest();
     void badConnection();
@@ -86,7 +95,9 @@ private:
 
     void softOff();
     void delay(float);
-    void barSingleLight(int);
+    void displayBarSingleLight(int);
+
+    void updateTreatmentHistory();
 
 
 private slots:
@@ -99,7 +110,7 @@ private slots:
     void toggleDurationDown();
     void startSession();
     void changeConnection();
-    void earConnect(int);
+    void earConnect();
     void toggleRecording();
 
 };
