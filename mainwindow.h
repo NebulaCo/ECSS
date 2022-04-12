@@ -59,12 +59,16 @@ private:
     QGraphicsScene *pi_scene;
     //Record indicator scene
     QGraphicsScene *rec_scene;
+    QTimer* temp;
 
     float battery;
     double userSessionTime;
 
     Session* currentSession;
     bool sessionRunning;
+    bool sessionPaused = false;
+
+    int blinkTimeLeft = 6;
 
     void displayBarLevel(int);
     void updateScreen();
@@ -88,9 +92,13 @@ private:
     void delay(float);
     void displayBarSingleLight(int);
 
+    void blinkBadConnection();
+    void resumeSession();
+    void pauseSession();
 
 private slots:
     void updateTimer();
+    void updateBlinkTimer();
     void checkPress();
     void togglePowerButton();
     void toggleIntensityUp();

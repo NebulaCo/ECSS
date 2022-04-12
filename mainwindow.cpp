@@ -296,7 +296,7 @@ void MainWindow::toggleIntensityUp(){
                 currentIntensity = 8;
             }
             currentSession->setIntensity(currentIntensity);
-            displayBarLevel(currentIntensity);
+            displayBarSingleLight(currentIntensity);
         } else {
             currentSessionType = (currentSessionType == SESSION_TYPE_COUNT-1) ? 0 : ++currentSessionType;
             updateScreen();
@@ -314,7 +314,7 @@ void MainWindow::toggleIntensityDown(){
                 currentIntensity = 1;
             }
             currentSession->setIntensity(currentIntensity);
-            displayBarLevel(currentIntensity);
+            displayBarSingleLight(currentIntensity);
 
         } else {
             currentSessionType = (currentSessionType == 0) ? SESSION_TYPE_COUNT - 1  : --currentSessionType;
@@ -342,10 +342,8 @@ void MainWindow::toggleDurationDown(){
 void MainWindow::startSession(){
     qInfo() << "checking canStartSession";
     if (canStartSession()){
-        //todo
+
         flashSelectedSession(currentSessionType);
-
-
         int duration;
         if (currentGroup == 2){
             duration = ui->group3Screen->text().toInt();
@@ -371,18 +369,11 @@ void MainWindow::initTimer(QTimer* t) {
 
     connect(t, &QTimer::timeout, this, &MainWindow::updateTimer);
 
+    qInfo() << "connection: " << connection;
     if (connection == 2 || connection == 3) {
         t->start(1000);
-    } else {
-        //todo: Stop timer
-
-        //bad connection
-        qInfo() << 'Please get a better connection.';
     }
-
 }
-
-
 
 void MainWindow::updateTimer(){
 
@@ -413,7 +404,7 @@ void MainWindow::updateTimer(){
 
 void MainWindow::drainBattery(){
     // 1 minute == 1 second
-    qInfo() << "drain battery function call: ";
+    qInfo() << "drain";
 
 
     // if intensity is 0, battery drains by 0.02% per second
@@ -476,6 +467,31 @@ bool MainWindow::connectionTest(){
     return false;
 }
 
+void MainWindow::blinkBadConnection(){
+
+    QTimer* blinkTimer = new QTimer(this);
+    connect(blinkTimer, &QTimer::timeout, this, &MainWindow::updateBlinkTimer);
+    blinkTimer->start(500);
+    temp = blinkTimer;
+
+}
+
+void MainWindow::updateBlinkTimer(){
+
+    if (blinkTimeLeft >= 0){
+        if (blinkTimeLeft % 2 == 0){
+            badConnection();
+        } else {
+            displayBarLevel(0);
+        }
+    } else {
+        temp->stop();
+        temp->disconnect();
+        displayBarLevel(0);
+    }
+    updateScreen();
+    blinkTimeLeft--;
+}
 void MainWindow::badConnection(){
     QString str;
     int i;
@@ -544,6 +560,22 @@ void MainWindow::flashSelectedSession(int session){
     }
 }
 
+void MainWindow::pauseSession(){
+    currentSession->getTimer()->stop();
+    currentSession->setIntensity(0);
+    blinkBadConnection();
+    sessionPaused = true;
+    qInfo() << "pausing session";
+}
+
+void MainWindow::resumeSession(){
+    sessionPaused = false;
+    currentSession->setIntensity(currentIntensity);
+    currentSession->getTimer()->start(1000);
+
+    qInfo() << "resuming session";
+}
+
 void MainWindow::changeConnection(){
     QString str = ui->connectionComboBox->currentText();
     if (str == "Bad"){
@@ -552,6 +584,13 @@ void MainWindow::changeConnection(){
         connection = 2;
     } else {
         connection = 3;
+    }
+    if (sessionRunning){
+        if (connection == 1){
+            pauseSession();
+        } else {
+            resumeSession();
+        }
     }
 }
 
@@ -579,5 +618,6 @@ void MainWindow::earConnect(){
             QPixmap right_CES (":/images/symbols/staticgraphics/right_CES_off.png");
             ui->right_CES_label->setPixmap(right_CES.scaled(75, 100, Qt::KeepAspectRatio));
         }
+        changeConnection();
     }
 }
