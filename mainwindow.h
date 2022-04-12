@@ -64,6 +64,7 @@ private:
     //Record indicator scene
     QGraphicsScene *rec_scene;
     QTimer* temp;
+    QTimer* lowBatteryTimer;
 
 
     QListWidget *activeQListWidget;
@@ -78,7 +79,7 @@ private:
     bool sessionRunning;
     bool sessionPaused = false;
 
-    int blinkTimeLeft = 6;
+    int blinkTimeLeft = 8;
 
     void displayBarLevel(int);
 
@@ -110,6 +111,7 @@ private:
     void updateTreatmentHistory();
 
 
+    void blinkLowBattery(float);
 private slots:
     void displayBattery();
     void updateTimer();
@@ -125,5 +127,7 @@ private slots:
     void earConnect();
     void toggleRecording();
 
+    void updatelowBatteryTimer();
+    void updateCriticalLowBatteryTimer();
 };
 #endif // MAINWINDOW_H

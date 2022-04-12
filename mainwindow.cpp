@@ -209,7 +209,7 @@ void MainWindow::toggleRecording(){
 }
 
 void MainWindow::togglePowerButton(){
-    if (buttonTimer.elapsed() >= 2000){
+    if (buttonTimer.elapsed() >= 1000){
         powerStatus = powerStatus ? false: true;
         if (powerStatus) {
             qInfo() << "Machine turned on.";
@@ -241,7 +241,7 @@ void MainWindow::displayBattery(){
     QTimer* batteryTimer = new QTimer(this);
     displayBarLevel(qCeil(battery/12.5));
     connect(batteryTimer, &QTimer::timeout, this, &MainWindow::displayEmptyBar);
-    batteryTimer->start(3000);
+    batteryTimer->start(4000);
 }
 
 void MainWindow::displayEmptyBar(){
@@ -454,32 +454,41 @@ void MainWindow::changeBattery(float newBattery)
 
         ui->batterySpinBox->setValue(newBattery);
 
-        //critical low 1 bar
-        if (battery <= 12.5){
-            //TODO
-            // stop blinking 2 bar (below statement)
-            //end session
-            //blink for few seconds and end blinking.
-        // warning 2 bar
-        } else if (battery <= 25){
-            // blink 2 bars
+        if (powerStatus){
+            if (battery <= 12.5){
+                qInfo() << "blinking very low battery";
+                blinkLowBattery(battery);
+                blinkTimeLeft = 8;
+            // warning 2 bar
+            } else if (battery <= 25){
+                qInfo() << "blinking low battery";
+                blinkLowBattery(battery);
+                blinkTimeLeft = 8;
+            }
         }
+
     }
 }
 
 bool MainWindow::connectionTest(){
 
     if (connection == 1){
-        MainWindow::badConnection();
         qInfo() << "bad connection";
+        blinkBadConnection();
         return false;
     } else if (connection == 2){
-        MainWindow::okayConnection();
         qInfo() << "okay connection";
+        MainWindow::okayConnection();
+        delay(4);
+        updateScreen();
+
         return true;
     } else if (connection == 3){
-        MainWindow::excellentConnection();
         qInfo() << "excellent connection";
+        MainWindow::excellentConnection();
+        delay(4);
+        updateScreen();
+
         return true;
     }
     return false;
@@ -494,6 +503,54 @@ void MainWindow::blinkBadConnection(){
 
 }
 
+void MainWindow::blinkLowBattery(float battery){
+    lowBatteryTimer = new QTimer(this);
+    if (battery <= 25){
+        connect(lowBatteryTimer, &QTimer::timeout, this, &MainWindow::updatelowBatteryTimer);
+    } else {
+        connect(lowBatteryTimer, &QTimer::timeout, this, &MainWindow::updateCriticalLowBatteryTimer);
+    }
+
+    lowBatteryTimer->start(500);
+    blinkTimeLeft = 8;
+}
+
+void MainWindow::updatelowBatteryTimer(){
+    if (blinkTimeLeft >= 0){
+        if (blinkTimeLeft % 2 == 0){
+            displayBattery();
+        } else {
+            displayBarLevel(0);
+        }
+    } else {
+        lowBatteryTimer->stop();
+        lowBatteryTimer->disconnect();
+        //blinkTimeLeft = 8;
+        displayBarLevel(0);
+    }
+    updateScreen();
+    blinkTimeLeft--;
+}
+
+void MainWindow::updateCriticalLowBatteryTimer(){
+    if (blinkTimeLeft >= 0){
+        if (blinkTimeLeft % 2 == 0){
+            displayBattery();
+        } else {
+            displayBarLevel(0);
+        }
+    } else {
+        lowBatteryTimer->stop();
+        lowBatteryTimer->disconnect();
+        //blinkTimeLeft = 8;
+        displayBarLevel(0);
+        powerStatus = false;
+        turnOff();
+    }
+    updateScreen();
+    blinkTimeLeft--;
+}
+
 void MainWindow::updateBlinkTimer(){
 
     if (blinkTimeLeft >= 0){
@@ -505,6 +562,7 @@ void MainWindow::updateBlinkTimer(){
     } else {
         temp->stop();
         temp->disconnect();
+        //blinkTimeLeft = 8;
         displayBarLevel(0);
     }
     updateScreen();
