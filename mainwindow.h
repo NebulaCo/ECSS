@@ -9,6 +9,7 @@
 #include <QTime>
 #include <QListWidget>
 #include <QDebug>
+#include <QtMath>
 
 #include "session.h"
 
@@ -80,10 +81,10 @@ private:
     int blinkTimeLeft = 6;
 
     void displayBarLevel(int);
-    void displayBattery(float);
+
     void updateScreen();
 
-
+    void displayEmptyBar();
     void initalizeVectors();
 
     bool connectionTest();
@@ -110,6 +111,7 @@ private:
 
 
 private slots:
+    void displayBattery();
     void updateTimer();
     void updateBlinkTimer();
     void checkPress();

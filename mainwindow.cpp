@@ -215,7 +215,7 @@ void MainWindow::togglePowerButton(){
             qInfo() << "Machine turned on.";
             qInfo() << "battery: " + QString::number(battery);
             pi_scene->setBackgroundBrush(Qt::green);
-            displayBarLevel(int(battery/12.5));
+            displayBattery();
             changeConnection();
             ui->group3Screen->setNum(userSessionTime);
             updateScreen();
@@ -236,6 +236,19 @@ void MainWindow::togglePowerButton(){
         updateScreen();
     }
 }
+
+void MainWindow::displayBattery(){
+    QTimer* batteryTimer = new QTimer(this);
+    displayBarLevel(qCeil(battery/12.5));
+    connect(batteryTimer, &QTimer::timeout, this, &MainWindow::displayEmptyBar);
+    batteryTimer->start(3000);
+}
+
+void MainWindow::displayEmptyBar(){
+    displayBarLevel(0);
+}
+
+
 
 void MainWindow::turnOff(){
     pi_scene->setBackgroundBrush(Qt::white);
