@@ -97,7 +97,6 @@ private:
 private slots:
     void displayBattery();
     void updateSessionTimer();
-    void updateBlinkTimer();
     void checkPress();
     void togglePowerButton();
     void toggleIntensityUp();
@@ -111,6 +110,5 @@ private slots:
 
     void updatelowBatteryTimer();
     void updateCriticalLowBatteryTimer();
-    void updateBlinkCESModeTimer();
 };
 #endif // MAINWINDOW_H

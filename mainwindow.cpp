@@ -127,6 +127,7 @@ void MainWindow::updateScreen(){
         rec_scene->setBackgroundBrush(Qt::white);
         pi_scene->setBackgroundBrush(Qt::white);
         updateTreatmentHistory();
+        ui->menuLabel->setVisible(false);
         return;
     }
 
@@ -134,6 +135,7 @@ void MainWindow::updateScreen(){
     // if the power is on
     pi_scene->setBackgroundBrush(Qt::green);
     ui->group3Screen->setNum(userSessionTime);
+    ui->menuLabel->setVisible(true);
 
 
     if (currentGroup != -1){
@@ -284,7 +286,7 @@ void MainWindow::softOff(){
     while (currentIntensity > 0){
         displayBarSingleLight(currentIntensity);
         currentIntensity--;
-        delay(1);
+        delay(0.5);
     }
 }
 
@@ -351,30 +353,30 @@ void MainWindow::toggleDurationDown(){
 }
 
 void MainWindow::startSession(){
-    qInfo() << "checking canStartSession";
-    if (canStartSession()){
+    if (!sessionRunning){
+        qInfo() << "checking canStartSession";
+        if (canStartSession()){
+            blinkSelectedSession(currentSessionType);
+            int duration;
+            qInfo() << "CRASH1";
+            if (currentGroup == 2){
+                duration = ui->group3Screen->text().toInt();
+            } else if (currentGroup == 0){
+                duration = 20;
+            } else {
+                duration = 45;
+            }
+            Session* ses = new Session(currentIntensity, currentSessionType, duration);
+            currentSession = ses;
+            sessionRunning = true;
 
-        blinkSelectedSession(currentSessionType);
-        int duration;
-        if (currentGroup == 2){
-            duration = ui->group3Screen->text().toInt();
-        } else if (currentGroup == 0){
-            duration = 20;
+            //start timer
+            initSessionTimer(ses->getTimer());
         } else {
-            duration = 45;
+            qInfo() << "cannot start session";
         }
-        Session* ses = new Session(currentIntensity, currentSessionType, duration);
-        currentSession = ses;
-        sessionRunning = true;
-
-        //start timer
-        initSessionTimer(ses->getTimer());
-    } else {
-        qInfo() << "cannot start session";
     }
 }
-
-
 
 void MainWindow::initSessionTimer(QTimer* t) {
 
@@ -464,17 +466,10 @@ void MainWindow::updateBattery(float newBattery)
 }
 
 void MainWindow::blinkCESMode(){
-    blinkTimer = new QTimer(this);
-    connect(blinkTimer, &QTimer::timeout, this, &MainWindow::updateBlinkCESModeTimer);
-    blinkTimer->start(500);
-    blinkTimeLeft = 8;
-}
 
-void MainWindow::updateBlinkCESModeTimer(){
-
-    if (blinkTimeLeft >= 0){
-        if (blinkTimeLeft % 2 == 0){
-            if (currentSession->getIsShortCESMode()){
+    for (int i = 0; i < 8; i++){
+        if (i % 2 == 0){
+            if (currentSessionType != 1){
                 QPixmap short_CES (":/images/symbols/staticgraphics/short_CES_on.png");
                 ui->short_CES_label->setPixmap(short_CES.scaled(75, 100, Qt::KeepAspectRatio));
             } else {
@@ -487,12 +482,9 @@ void MainWindow::updateBlinkCESModeTimer(){
             QPixmap duty_CES (":/images/symbols/staticgraphics/duty_cycle_CES_off.png");
             ui->duty_CES_label->setPixmap(duty_CES.scaled(75, 100, Qt::KeepAspectRatio));
         }
-    } else {
-        blinkTimer->stop();
-        blinkTimer->disconnect();
+        delay(0.4);
     }
     updateScreen();
-    blinkTimeLeft--;
 }
 
 void MainWindow::blinkLowBattery(float battery){
@@ -547,28 +539,15 @@ void MainWindow::updateCriticalLowBatteryTimer(){
 
 void MainWindow::blinkBadConnection(){
 
-    blinkTimer = new QTimer(this);
-    connect(blinkTimer, &QTimer::timeout, this, &MainWindow::updateBlinkTimer);
-    blinkTimer->start(400);
-    blinkTimeLeft = 8;
-}
-
-void MainWindow::updateBlinkTimer(){
-
-    if (blinkTimeLeft >= 0){
-        if (blinkTimeLeft % 2 == 0){
+    for (int i = 0; i < 8; i++){
+        if (i % 2 == 0){
             badConnection();
         } else {
             displayBarLevel(0);
         }
-    } else {
-        blinkTimer->stop();
-        blinkTimer->disconnect();
-        //blinkTimeLeft = 8;
-        displayBarLevel(0);
+        delay(0.4);
     }
     updateScreen();
-    blinkTimeLeft--;
 }
 
 bool MainWindow::canStartSession(){
@@ -591,13 +570,13 @@ bool MainWindow::connectionTest(){
         return false;
     } else if (connection == 2){
         qInfo() << "okay connection";
-        MainWindow::okayConnection();
+        okayConnection();
         blinkCESMode();
         updateScreen();
         return true;
     } else if (connection == 3){
         qInfo() << "excellent connection";
-        MainWindow::excellentConnection();
+        excellentConnection();
         blinkCESMode();
         updateScreen();
         return true;
@@ -657,6 +636,7 @@ void MainWindow::blinkSelectedSession(int session){
         } else {
             displayBarSingleLight(0);
         }
+        updateScreen();
         delay(0.4);
     }
 }
