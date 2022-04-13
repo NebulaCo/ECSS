@@ -128,6 +128,8 @@ void MainWindow::updateScreen(){
         pi_scene->setBackgroundBrush(Qt::white);
         updateTreatmentHistory();
         ui->menuLabel->setVisible(false);
+        activeQListWidget->setVisible(false);
+
         return;
     }
 
@@ -136,6 +138,7 @@ void MainWindow::updateScreen(){
     pi_scene->setBackgroundBrush(Qt::green);
     ui->group3Screen->setNum(userSessionTime);
     ui->menuLabel->setVisible(true);
+    activeQListWidget->setVisible(true);
 
 
     if (currentGroup != -1){
@@ -176,6 +179,15 @@ void MainWindow::updateScreen(){
             sessionVector.at(i)->setPixmap(sessionOff.scaled(75,100, Qt::KeepAspectRatio));
 
         }
+    }
+
+    if (ui->leftEarComboBox->currentText() == "True"){
+        QPixmap left_CES (":/images/symbols/staticgraphics/left_CES_on.png");
+        ui->left_CES_label->setPixmap(left_CES.scaled(75, 100, Qt::KeepAspectRatio));
+    }
+    if (ui->rightEarComboBox->currentText() == "True"){
+        QPixmap right_CES (":/images/symbols/staticgraphics/right_CES_on.png");
+        ui->right_CES_label->setPixmap(right_CES.scaled(75, 100, Qt::KeepAspectRatio));
     }
 }
 
@@ -484,7 +496,7 @@ void MainWindow::blinkCESMode(){
         }
         delay(0.4);
     }
-    updateScreen();
+    //updateScreen();
 }
 
 void MainWindow::blinkLowBattery(float battery){
