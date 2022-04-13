@@ -7,6 +7,8 @@ Session::Session(int i, int sesh, int t) {
     duration = t;
     timeLeft = t;
 
+    isShortCESMode = (sesh == 1) ? false : true;
+
     timer = new QTimer(this);
 }
 
@@ -23,6 +25,8 @@ int Session::getDuration() const{ return duration; }
 QTimer *Session::getTimer() const { return timer; }
 
 int Session::getTimeLeft() const { return timeLeft; }
+
+bool Session::getIsShortCESMode() const { return isShortCESMode; }
 
 void Session::setIntensity(int i){
     intensityLevel = i;
