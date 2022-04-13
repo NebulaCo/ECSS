@@ -5,9 +5,6 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
 
-//    QPixmap checkButtonImage (":/images/symbols/buttons/check");
-//    ui->checkButtonImage->setPixmap(checkButtonImage);
-
     connect(ui->powerButton, SIGNAL(pressed()), this, SLOT(checkPress()));
     connect(ui->intensityUpButton, SIGNAL(pressed()), this, SLOT(checkPress()));
     connect(ui->intensityDownButton, SIGNAL(pressed()), this, SLOT(checkPress()));
@@ -23,14 +20,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     powerStatus = false;
     recordSession = false;
     userSessionTime = 60;
+
     //Admin
     battery = 100.0;
-    //battery level spinbox
-    connect(ui->batterySpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::changeBattery);
-
-    //connection spin box
+    connect(ui->batterySpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::updateBattery);
     connect(ui->connectionComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::changeConnection);
-
     connect(ui->leftEarComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::earConnect);
     connect(ui->rightEarComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::earConnect);
 
@@ -86,33 +80,22 @@ void MainWindow::initalizeVectors(){
 
 }
 
-void MainWindow::displayBarLevel(int bars){
-
-//    int bars = int(battery / 12.5);
-    QString str;
-    int i;
-    for (i = 0; i < bars; i++){
-        str = QString::number(i+1);
-        QPixmap numOn (":/images/symbols/bars/bar"+str+"on.png");
-        barVector.at(i)->setPixmap(numOn.scaled(50, 50, Qt::KeepAspectRatio));
-    }
-    for (i = bars; i < BAR_COUNT; i++){
-        str = QString::number(i+1);
-        QPixmap numOff (":/images/symbols/bars/bar"+str+"off.png");
-        barVector.at(i)->setPixmap(numOff.scaled(50, 50, Qt::KeepAspectRatio));
-    }
-}
-
-
-
 void MainWindow::checkPress() {
     buttonTimer.restart();
+}
+
+void MainWindow::updateTreatmentHistory(){
+    activeQListWidget->clear();
+    activeQListWidget->addItems(sessionHistoryView);
+    activeQListWidget->setCurrentRow(0);
+
 }
 
 void MainWindow::updateScreen(){
     int i;
     QString str;
 
+    //if the power is off
     if (!powerStatus){
         for (i = 0; i < sessionVector.size(); i++){
             str = QString::number(i+1);
@@ -142,9 +125,17 @@ void MainWindow::updateScreen(){
         ui->duty_CES_label->setPixmap(duty_CES.scaled(75, 100, Qt::KeepAspectRatio));
 
         rec_scene->setBackgroundBrush(Qt::white);
+        pi_scene->setBackgroundBrush(Qt::white);
         updateTreatmentHistory();
         return;
     }
+
+
+    // if the power is on
+    pi_scene->setBackgroundBrush(Qt::green);
+    ui->group3Screen->setNum(userSessionTime);
+
+
     if (currentGroup != -1){
         for (i = 0; i < groupVector.size(); i++){
             str = QString::number(i+1);
@@ -184,13 +175,12 @@ void MainWindow::updateScreen(){
 
         }
     }
-
-
-    ui->group3Screen->setNum(userSessionTime);
-
 }
 
 void MainWindow::toggleRecording(){
+    if (powerStatus){
+
+    }
     if (sessionRunning == true){
         if (powerStatus){
             recordSession = recordSession ? false: true;
@@ -199,9 +189,6 @@ void MainWindow::toggleRecording(){
             } else {
                 rec_scene->setBackgroundBrush(Qt::white);
             }
-        } else {
-            recordSession = false;
-            rec_scene->setBackgroundBrush(Qt::white);
         }
     } else {
         qInfo() << "No session running, cant record";
@@ -209,32 +196,25 @@ void MainWindow::toggleRecording(){
 }
 
 void MainWindow::togglePowerButton(){
+
     if (buttonTimer.elapsed() >= 1000){
+        //change power status
         powerStatus = powerStatus ? false: true;
         if (powerStatus) {
             qInfo() << "Machine turned on.";
-            qInfo() << "battery: " + QString::number(battery);
-            pi_scene->setBackgroundBrush(Qt::green);
             displayBattery();
             changeConnection();
-            ui->group3Screen->setNum(userSessionTime);
             updateScreen();
 
-
         } else {
-            qInfo() << "Machine turned off.";
-            if (sessionRunning){
-                currentSession->setTimeLeft(0);
-                currentSession->getTimer()->stop();
-                currentSession->getTimer()->disconnect();
-            }
             turnOff();
         }
     } else if (powerStatus){
-        //Cycling
+        //Cycling groups
         currentGroup = (currentGroup == GROUP_COUNT - 1) ? 0 : ++currentGroup;
-        updateScreen();
+
     }
+    updateScreen();
 }
 
 void MainWindow::displayBattery(){
@@ -248,34 +228,19 @@ void MainWindow::displayEmptyBar(){
     displayBarLevel(0);
 }
 
+void MainWindow::displayBarLevel(int bars){
 
-
-void MainWindow::turnOff(){
-    pi_scene->setBackgroundBrush(Qt::white);
-    recordSession = false;
-    sessionRunning = false;
-    connection = -1;
-    currentGroup = -1;
-    currentSessionType = -1;
-    currentIntensity = 0;
-
-    displayBarLevel(0);
-    updateScreen();
-}
-
-void MainWindow::softOff(){
-    qInfo() << "doing softoff";
-    while (currentIntensity > 0){
-        displayBarSingleLight(currentIntensity);
-        currentIntensity--;
-        delay(1);
+    QString str;
+    int i;
+    for (i = 0; i < bars; i++){
+        str = QString::number(i+1);
+        QPixmap numOn (":/images/symbols/bars/bar"+str+"on.png");
+        barVector.at(i)->setPixmap(numOn.scaled(50, 50, Qt::KeepAspectRatio));
     }
-}
-
-void MainWindow::delay(float delayDuration){
-    QTime dieTime = QTime::currentTime().addMSecs(delayDuration * 1000);
-    while (QTime::currentTime() < dieTime){
-        QCoreApplication::processEvents(QEventLoop::AllEvents,100);
+    for (i = bars; i < BAR_COUNT; i++){
+        str = QString::number(i+1);
+        QPixmap numOff (":/images/symbols/bars/bar"+str+"off.png");
+        barVector.at(i)->setPixmap(numOff.scaled(50, 50, Qt::KeepAspectRatio));
     }
 }
 
@@ -294,13 +259,41 @@ void MainWindow::displayBarSingleLight(int bar){
     }
 }
 
-void MainWindow::updateTreatmentHistory(){
-    activeQListWidget->clear();
-    activeQListWidget->addItems(sessionHistoryView);
-    activeQListWidget->setCurrentRow(0);
+void MainWindow::turnOff(){
+    qInfo() << "Machine turned off.";
+
+    if (sessionRunning){
+        currentSession->setTimeLeft(0);
+        currentSession->getTimer()->stop();
+        currentSession->getTimer()->disconnect();
+        sessionRunning = false;
+    }
+
+    recordSession = false;
+    connection = -1;
+    currentGroup = -1;
+    currentSessionType = -1;
+    currentIntensity = 0;
+
+    displayBarLevel(0);
 
 }
 
+void MainWindow::softOff(){
+    qInfo() << "doing softoff";
+    while (currentIntensity > 0){
+        displayBarSingleLight(currentIntensity);
+        currentIntensity--;
+        delay(1);
+    }
+}
+
+void MainWindow::delay(float delayDuration){
+    QTime dieTime = QTime::currentTime().addMSecs(delayDuration * 1000);
+    while (QTime::currentTime() < dieTime){
+        QCoreApplication::processEvents(QEventLoop::AllEvents,100);
+    }
+}
 
 void MainWindow::toggleIntensityUp(){
     if (powerStatus){
@@ -314,6 +307,7 @@ void MainWindow::toggleIntensityUp(){
             currentSession->setIntensity(currentIntensity);
             displayBarSingleLight(currentIntensity);
         } else {
+            // change session type
             currentSessionType = (currentSessionType == SESSION_TYPE_COUNT-1) ? 0 : ++currentSessionType;
             updateScreen();
         }
@@ -333,7 +327,7 @@ void MainWindow::toggleIntensityDown(){
             displayBarSingleLight(currentIntensity);
 
         } else {
-
+            // change session type
             currentSessionType = (currentSessionType <= 0) ? SESSION_TYPE_COUNT - 1  : --currentSessionType;
             updateScreen();
         }
@@ -360,7 +354,7 @@ void MainWindow::startSession(){
     qInfo() << "checking canStartSession";
     if (canStartSession()){
 
-        flashSelectedSession(currentSessionType);
+        blinkSelectedSession(currentSessionType);
         int duration;
         if (currentGroup == 2){
             duration = ui->group3Screen->text().toInt();
@@ -370,21 +364,21 @@ void MainWindow::startSession(){
             duration = 45;
         }
         Session* ses = new Session(currentIntensity, currentSessionType, duration);
-
         currentSession = ses;
         sessionRunning = true;
 
-
         //start timer
-        initTimer(ses->getTimer());
+        initSessionTimer(ses->getTimer());
     } else {
         qInfo() << "cannot start session";
     }
 }
 
-void MainWindow::initTimer(QTimer* t) {
 
-    connect(t, &QTimer::timeout, this, &MainWindow::updateTimer);
+
+void MainWindow::initSessionTimer(QTimer* t) {
+
+    connect(t, &QTimer::timeout, this, &MainWindow::updateSessionTimer);
 
     qInfo() << "connection: " << connection;
     if (connection == 2 || connection == 3) {
@@ -392,7 +386,7 @@ void MainWindow::initTimer(QTimer* t) {
     }
 }
 
-void MainWindow::updateTimer(){
+void MainWindow::updateSessionTimer(){
 
     drainBattery();
     currentSession->decrementTimeLeft();
@@ -412,12 +406,10 @@ void MainWindow::updateTimer(){
         sessionRunning = false;
         powerStatus = false;
 
-
         softOff();
         turnOff();
     }
-
-
+    updateScreen();
 }
 
 void MainWindow::drainBattery(){
@@ -436,10 +428,10 @@ void MainWindow::drainBattery(){
     if (battery < 0){
         battery = 0;
     }
-    changeBattery(battery);
+    updateBattery(battery);
 }
 
-void MainWindow::changeBattery(float newBattery)
+void MainWindow::updateBattery(float newBattery)
 {
 
     if (newBattery >= 0 && newBattery <= 100){
@@ -468,50 +460,52 @@ void MainWindow::changeBattery(float newBattery)
         }
 
     }
+    updateScreen();
 }
 
-bool MainWindow::connectionTest(){
-
-    if (connection == 1){
-        qInfo() << "bad connection";
-        blinkBadConnection();
-        return false;
-    } else if (connection == 2){
-        qInfo() << "okay connection";
-        MainWindow::okayConnection();
-        delay(4);
-        updateScreen();
-
-        return true;
-    } else if (connection == 3){
-        qInfo() << "excellent connection";
-        MainWindow::excellentConnection();
-        delay(4);
-        updateScreen();
-
-        return true;
-    }
-    return false;
-}
-
-void MainWindow::blinkBadConnection(){
-
-    QTimer* blinkTimer = new QTimer(this);
-    connect(blinkTimer, &QTimer::timeout, this, &MainWindow::updateBlinkTimer);
+void MainWindow::blinkCESMode(){
+    blinkTimer = new QTimer(this);
+    connect(blinkTimer, &QTimer::timeout, this, &MainWindow::updateBlinkCESModeTimer);
     blinkTimer->start(500);
-    temp = blinkTimer;
+    blinkTimeLeft = 8;
+}
 
+void MainWindow::updateBlinkCESModeTimer(){
+
+    if (blinkTimeLeft >= 0){
+        if (blinkTimeLeft % 2 == 0){
+            if (currentSession->getIsShortCESMode()){
+                QPixmap short_CES (":/images/symbols/staticgraphics/short_CES_on.png");
+                ui->short_CES_label->setPixmap(short_CES.scaled(75, 100, Qt::KeepAspectRatio));
+            } else {
+                QPixmap duty_CES (":/images/symbols/staticgraphics/duty_cycle_CES_on.png");
+                ui->duty_CES_label->setPixmap(duty_CES.scaled(75, 100, Qt::KeepAspectRatio));
+            }
+        } else {
+            QPixmap short_CES (":/images/symbols/staticgraphics/short_CES_off.png");
+            ui->short_CES_label->setPixmap(short_CES.scaled(75, 100, Qt::KeepAspectRatio));
+            QPixmap duty_CES (":/images/symbols/staticgraphics/duty_cycle_CES_off.png");
+            ui->duty_CES_label->setPixmap(duty_CES.scaled(75, 100, Qt::KeepAspectRatio));
+        }
+    } else {
+        blinkTimer->stop();
+        blinkTimer->disconnect();
+    }
+    updateScreen();
+    blinkTimeLeft--;
 }
 
 void MainWindow::blinkLowBattery(float battery){
     lowBatteryTimer = new QTimer(this);
-    if (battery <= 25){
-        connect(lowBatteryTimer, &QTimer::timeout, this, &MainWindow::updatelowBatteryTimer);
-    } else {
-        connect(lowBatteryTimer, &QTimer::timeout, this, &MainWindow::updateCriticalLowBatteryTimer);
+    if (powerStatus){
+        if (battery <= 25 && battery > 12.5){
+            connect(lowBatteryTimer, &QTimer::timeout, this, &MainWindow::updatelowBatteryTimer);
+        } else if (battery <= 12.5){
+            connect(lowBatteryTimer, &QTimer::timeout, this, &MainWindow::updateCriticalLowBatteryTimer);
+        }
     }
 
-    lowBatteryTimer->start(500);
+    lowBatteryTimer->start(300);
     blinkTimeLeft = 8;
 }
 
@@ -551,6 +545,14 @@ void MainWindow::updateCriticalLowBatteryTimer(){
     blinkTimeLeft--;
 }
 
+void MainWindow::blinkBadConnection(){
+
+    blinkTimer = new QTimer(this);
+    connect(blinkTimer, &QTimer::timeout, this, &MainWindow::updateBlinkTimer);
+    blinkTimer->start(400);
+    blinkTimeLeft = 8;
+}
+
 void MainWindow::updateBlinkTimer(){
 
     if (blinkTimeLeft >= 0){
@@ -560,14 +562,49 @@ void MainWindow::updateBlinkTimer(){
             displayBarLevel(0);
         }
     } else {
-        temp->stop();
-        temp->disconnect();
+        blinkTimer->stop();
+        blinkTimer->disconnect();
         //blinkTimeLeft = 8;
         displayBarLevel(0);
     }
     updateScreen();
     blinkTimeLeft--;
 }
+
+bool MainWindow::canStartSession(){
+    if (powerStatus){
+        if (currentGroup != -1 && currentSessionType != -1){
+            return connectionTest();
+        } else {
+            qInfo() << "Session duration or session type not selected.";
+            return false;
+        }
+    }
+    return false;
+}
+
+bool MainWindow::connectionTest(){
+
+    if (connection == 1){
+        qInfo() << "bad connection";
+        blinkBadConnection();
+        return false;
+    } else if (connection == 2){
+        qInfo() << "okay connection";
+        MainWindow::okayConnection();
+        blinkCESMode();
+        updateScreen();
+        return true;
+    } else if (connection == 3){
+        qInfo() << "excellent connection";
+        MainWindow::excellentConnection();
+        blinkCESMode();
+        updateScreen();
+        return true;
+    }
+    return false;
+}
+
 void MainWindow::badConnection(){
     QString str;
     int i;
@@ -613,19 +650,7 @@ void MainWindow::excellentConnection(){
     }
 }
 
-bool MainWindow::canStartSession(){
-    if (powerStatus){
-        if (currentGroup != -1 && currentSessionType != -1){
-            return connectionTest();
-        } else {
-            qInfo() << "Session duration or session type not selected.";
-            return false;
-        }
-    }
-    return false;
-}
-
-void MainWindow::flashSelectedSession(int session){
+void MainWindow::blinkSelectedSession(int session){
     for (int i = 0; i < 6; i++){
         if (i % 2 == 0){
             displayBarSingleLight(session+1);
@@ -634,22 +659,6 @@ void MainWindow::flashSelectedSession(int session){
         }
         delay(0.4);
     }
-}
-
-void MainWindow::pauseSession(){
-    currentSession->getTimer()->stop();
-    currentSession->setIntensity(0);
-    blinkBadConnection();
-    sessionPaused = true;
-    qInfo() << "pausing session";
-}
-
-void MainWindow::resumeSession(){
-    sessionPaused = false;
-    currentSession->setIntensity(currentIntensity);
-    currentSession->getTimer()->start(1000);
-
-    qInfo() << "resuming session";
 }
 
 void MainWindow::changeConnection(){
@@ -668,6 +677,22 @@ void MainWindow::changeConnection(){
             resumeSession();
         }
     }
+}
+
+void MainWindow::pauseSession(){
+    currentSession->getTimer()->stop();
+    currentSession->setIntensity(0);
+    blinkBadConnection();
+    sessionPaused = true;
+    qInfo() << "pausing session";
+}
+
+void MainWindow::resumeSession(){
+    sessionPaused = false;
+    currentSession->setIntensity(currentIntensity);
+    currentSession->getTimer()->start(1000);
+
+    qInfo() << "resuming session";
 }
 
 void MainWindow::earConnect(){
@@ -696,4 +721,5 @@ void MainWindow::earConnect(){
         }
         changeConnection();
     }
+    updateScreen();
 }

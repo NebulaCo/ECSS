@@ -35,86 +35,68 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    QElapsedTimer buttonTimer;
-    bool powerStatus;
-
-    bool recordSession;
-
     QVector <QLabel*> barVector;
     QVector <QLabel*> groupVector;
     QVector <QLabel*> sessionVector;
 
-    //todo: Vector of sessions
+    //Vector of sessions
     QVector <Session*> sessionHistory;
     QStringList sessionHistoryView;
-
-
-    int currentGroup;
-    int currentSessionType;
-
-    int currentIntensity;
-
-    // Connection 1 = bad connection
-    //            2 = okay connection
-    //            3 = excellent connection
-    int connection;
 
     //Power indicator scene
     QGraphicsScene *pi_scene;
     //Record indicator scene
     QGraphicsScene *rec_scene;
-    QTimer* temp;
-    QTimer* lowBatteryTimer;
 
+    QElapsedTimer buttonTimer;
+    QTimer* blinkTimer;
+    QTimer* lowBatteryTimer;
 
     QListWidget *activeQListWidget;
 
 
-
-
+    bool powerStatus;
+    bool recordSession;
+    int currentGroup;
+    int currentSessionType;
+    int currentIntensity;
     float battery;
     double userSessionTime;
-
+    // 1 = bad connection; 2 = okay connection; 3 = excellent connection
+    int connection;
     Session* currentSession;
     bool sessionRunning;
     bool sessionPaused = false;
-
     int blinkTimeLeft = 8;
 
-    void displayBarLevel(int);
 
-    void updateScreen();
-
-    void displayEmptyBar();
     void initalizeVectors();
-
+    void updateTreatmentHistory();
+    void updateScreen();
+    void displayEmptyBar();
+    void displayBarLevel(int);
+    void displayBarSingleLight(int);
+    void turnOff();
+    void softOff();
+    void delay(float);
+    void initSessionTimer(QTimer*);
+    void drainBattery();
+    void updateBattery(float);
+    void blinkCESMode();
+    void blinkLowBattery(float);
+    void blinkBadConnection();
+    bool canStartSession();
     bool connectionTest();
     void badConnection();
     void okayConnection();
     void excellentConnection();
-    void turnOff();
-    bool canStartSession();
-    void flashSelectedSession(int);
-    void initTimer(QTimer*);
-
-    void drainBattery();
-    void changeBattery(float);
-
-    void softOff();
-    void delay(float);
-    void displayBarSingleLight(int);
-
-    void blinkBadConnection();
-    void resumeSession();
+    void blinkSelectedSession(int);
     void pauseSession();
+    void resumeSession();
 
-    void updateTreatmentHistory();
-
-
-    void blinkLowBattery(float);
 private slots:
     void displayBattery();
-    void updateTimer();
+    void updateSessionTimer();
     void updateBlinkTimer();
     void checkPress();
     void togglePowerButton();
@@ -129,5 +111,6 @@ private slots:
 
     void updatelowBatteryTimer();
     void updateCriticalLowBatteryTimer();
+    void updateBlinkCESModeTimer();
 };
 #endif // MAINWINDOW_H
