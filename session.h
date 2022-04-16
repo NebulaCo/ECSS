@@ -15,6 +15,7 @@
    - int timeLeft: An integer representation of time left of the session
    - bool isShortCESMode: bool representation to trck if the session is short-pulse or 50% heavy duty
 
+
    Class functions:
    -getters and setters for data members
 

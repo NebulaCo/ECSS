@@ -17,20 +17,18 @@
 
     Data members:
 
-    QVector <QLabel*> barVector:
-    QVector <QLabel*> groupVector:
-    QVector <QLabel*> sessionVector:
+    QVector <QLabel*> barVector:        vector of QLabels corresponding to battery bars
+    QVector <QLabel*> groupVector:      vector of QLabels corresponding to session groups
+    QVector <QLabel*> sessionVector:    vector of QLabels corresponding to sessions
 
     //Vector of sessions
-    QVector <Session*> sessionHistory:
-    QStringList sessionHistoryView:
+    QVector <Session*> sessionHistory:  vector holding session history
+    QStringList sessionHistoryView:     UI element displaying session history
 
-    //Power indicator scene
-    QGraphicsScene *pi_scene:
-    //Record indicator scene
-    QGraphicsScene *rec_scene:
+    QGraphicsScene *pi_scene:           bar displaying power status
+    QGraphicsScene *rec_scene:          bar displaying recording status
 
-    QElapsedTimer buttonTimer:
+    QElapsedTimer buttonTimer:          timer used to differentiate between clicking and holding down of buttons
     QTimer* blinkTimer:                 keep track of blink timer
     QTimer* lowBatteryTimer:            keep track of how much time left for low battery blinking
 
@@ -53,9 +51,9 @@
 
     Functions:
 
-    void initalizeVectors():            .
-    void updateTreatmentHistory():      .
-    void updateScreen():                .
+    void initalizeVectors():            appends all necessary UI elements to the appropiate vectors
+    void updateTreatmentHistory():      updates treatment history window on UI
+    void updateScreen():                updates screen to display any relavant changes
     void displayEmptyBar():             switch off all the 8 bars off the bas
     void displayBarLevel(int n):        switch on n number of bars on graph starting from the bottom
     void displayBarSingleLight(int n):  switch on n_th bar from the bottom
@@ -79,16 +77,16 @@
 
     void displayBattery():              Display battery on bar graph
     void updateSessionTimer():          Update session timer and check if session has ended or not
-    void checkPress():
-    void togglePowerButton():
-    void toggleIntensityUp():
-    void toggleIntensityDown():
-    void toggleDurationUp():
-    void toggleDurationDown():
+    void checkPress():                  Resets timer on button press, to see how long it is held down for
+    void togglePowerButton():           Handles all functionality of the power button
+    void toggleIntensityUp():           Handles all functionality of the intensity up button
+    void toggleIntensityDown():         Handles all functionality of the intensity down button
+    void toggleDurationUp():            Handles all functionality of the duration up button
+    void toggleDurationDown():          Handles all functionality of the duration down button
     void startSession():                Start a session
     void changeConnection():            Update the connection. Resume/pause session if connection is changed and session is running.
     void earConnect():                  Update ear connection
-    void toggleRecording():
+    void toggleRecording():             Toggles recording button
     void updatelowBatteryTimer():       Update timer for blinking low battery
     void updateCriticalLowBatteryTimer():   Update timer for blinking critically low battery timer and turn off the machine
 
