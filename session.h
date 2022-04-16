@@ -17,6 +17,8 @@
 
    Class functions:
    -getters and setters for data members
+
+   void decrementTimeLeft(): decrease time left by 1
  */
 
 class Session: public QObject{

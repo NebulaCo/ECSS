@@ -370,7 +370,6 @@ void MainWindow::startSession(){
         if (canStartSession()){
             blinkSelectedSession(currentSessionType);
             int duration;
-            qInfo() << "CRASH1";
             if (currentGroup == 2){
                 duration = ui->group3Screen->text().toInt();
             } else if (currentGroup == 0){
@@ -405,7 +404,7 @@ void MainWindow::updateSessionTimer(){
     drainBattery();
     currentSession->decrementTimeLeft();
     qInfo() << "intensity is " << currentSession->getIntensityLvl();
-
+    qInfo() << "time left: " << currentSession->getTimeLeft();
     if (currentSession->getTimeLeft() == 0){
         currentSession->getTimer()->stop();
         currentSession->getTimer()->disconnect();
