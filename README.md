@@ -13,7 +13,7 @@
 ---
 
 ### Description
-This program simulates a Mind Alive [Oasis Pro Cranio-Electro Stimulation ](https://mindalive.com/products/oasis-pro) device through the use of C++ and the QT framework.
+This program simulates a Mind Alive [Oasis Pro Cranio-Electro Stimulation](https://mindalive.com/products/oasis-pro) device through the use of C++ and the QT framework.
 
 A CES (Cranio-Electro Stimulation) is a non-invasive neuro-stimulation medical device that delivers a microcurrent via small electrode clips through the earlobes to stimulate the brain for the purpose of therapeutic intervention.
 
@@ -23,13 +23,13 @@ The microcurrent flowing through the earclips is tiny (millionths of an ampere) 
 
 All functionalities of the CES including turning the device On/Off, selecting a session, determining session length, intensity manipulation, and recording a session are replicated in this program which can be launched using the instructions featured below.
 
-Project documentation can be found in the [Docs](https://github.com/NebulaCo/ECSS/tree/main/docs) folder.
+Project documentation can be found in the [/docs](https://github.com/NebulaCo/ECSS/tree/main/docs) folder.
 
 ---
 
 ### Setup/Launch Instructions:
 
-- [Download](https://github.com/NebulaCo/ECSS/archive/refs/heads/main.zip) the code
+- [Download](https://github.com/NebulaCo/ECSS/archive/refs/heads/main.zip) the source code
 - Unzip and go to the ECSS directory
 - Launch QT C++ and open the .pro file located in /src
 - Run the program using the green ▶ icon in the bottom left corner.
